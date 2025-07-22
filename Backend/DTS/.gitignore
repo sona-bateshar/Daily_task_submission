@@ -1,6 +1,4 @@
 # Ignore environment variables file
-env.development
-env.main
 test_files
 /staticfiles/
 

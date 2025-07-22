@@ -1,10 +1,15 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import TestComponents from "./pages/TestComponents";
+// import LoginPage from "./pages/LoginPage"; // create this if not yet
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-blue-600">
-        Tailwind is working! 🎉
-      </h1>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<TestComponents />} />
+      </Routes>
+    </Router>
   );
 }
 
