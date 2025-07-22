@@ -1,0 +1,92 @@
+# Ignore environment variables file
+env.development
+env.main
+test_files
+/staticfiles/
+
+
+
+
+
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# Django migrations
+**/migrations/
+!*/migrations/__init__.py
+
+# Environment variables
+.env
+.env.*
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Virtualenv
+venv/
+env/
+ENV/
+.myenv/
+.myvenv/
+
+# IDEs
+.idea/
+*.swp
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+
+# pytest
+.pytest_cache/
+.cache
+
+# MyPy
+.mypy_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# System
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Local apps
+*.tgz
+*.gz
+*.zip
+
+# Pip files
+pip-log.txt
+pip-delete-this-directory.txt
