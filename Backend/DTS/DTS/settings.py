@@ -56,10 +56,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third-party apps
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'corsheaders',
+    
+
+    # only needed for dev to test website on https instead of http for cookies. 
+    'django_extensions',
 
     # project apps
     'accounts',
@@ -69,15 +73,18 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+
+    'accounts.middleware.ClientTypeMiddleware',  # Add this line
+
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'DTS.urls'
@@ -143,14 +150,77 @@ REST_FRAMEWORK = {
 
 
 
+
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Shorter for better security
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),   # Longer for user convenience
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=10),  # Shorter for better security
+    'REFRESH_TOKEN_LIFETIME': timedelta(seconds=70),   # Longer for user convenience
     'ROTATE_REFRESH_TOKENS': True, # Enhances security
     'BLACKLIST_AFTER_ROTATION': True, # Requires 'rest_framework_simplejwt.token_blacklist' in INSTALLED_APPS
     'UPDATE_LAST_LOGIN': True, # Requires 'rest_framework_simplejwt.token_blacklist' in INSTALLED_APPS
-    
 }
+
+
+# --- djangorestframework-simplejwt Settings ---
+# SIMPLE_JWT = {
+#     # 1. Token Lifetimes
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Short-lived for security (e.g., 5-15 min)
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),   # Longer-lived (e.g., 7 days to 30 days)
+
+#     # 2. Token Rotation and Blacklisting (Highly Recommended)
+#     'ROTATE_REFRESH_TOKENS': True,          # Issues a new refresh token with each refresh
+#     'BLACKLIST_AFTER_ROTATION': True,       # Invalidates the old refresh token after rotation
+#     'UPDATE_LAST_LOGIN': True,
+#     # Make sure 'rest_framework_simplejwt.token_blacklist' is in INSTALLED_APPS for blacklisting to work
+
+#     # # 3. User Identification (Standard)
+#     # 'USER_ID_FIELD': 'id',                  # Field in your User model to identify the user
+#     # 'USER_ID_CLAIM': 'user_id',             # Claim name in the JWT payload for the user ID
+
+#     # # 4. Token Types and Header (Access Token always in Headers)
+#     # 'AUTH_HEADER_TYPES': ('Bearer',),       # e.g., "Authorization: Bearer <token>"
+#     # 'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION', # Standard HTTP header name
+
+#     # # 5. Algorithm and Signing Key
+#     # 'ALGORITHM': 'HS256', # Or 'RS256' for asymmetric keys (more complex setup)
+#     # # It's recommended to use a separate, strong key for JWTs, not just SECRET_KEY
+#     # 'SIGNING_KEY': os.environ.get('SIMPLE_JWT_SIGNING_KEY', os.getenv('DJANGO_SECRET_KEY')),
+#     # 'VERIFYING_KEY': None, # Only needed for asymmetric algorithms (RS256, etc.)
+
+#     # 6. Cookie Settings (Primarily for Web Clients)
+#     #
+#     # Refresh Token (Web: Received/Sent in HttpOnly, Secure Cookies)
+#     'AUTH_COOKIE_REFRESH': 'jwt_refresh_token', # Name of the refresh token cookie
+#     'AUTH_COOKIE_REFRESH_HTTP_ONLY': True,  # CRITICAL: JavaScript cannot access this cookie
+#     'AUTH_COOKIE_REFRESH_SECURE': True,     # CRITICAL: Only send over HTTPS
+#     'AUTH_COOKIE_REFRESH_SAMESITE': 'Lax',  # Protects against CSRF. 'Lax' is good for SPAs.
+#                                             # Can be 'Strict' or 'None' (if you need cross-site, requires Secure)
+#     'AUTH_COOKIE_REFRESH_PATH': '/',        # Path for which the cookie is valid
+
+#     # Access Token (Web: Received in JSON Body, Stored in JS Memory, Sent in Header)
+#     # We explicitly *don't* set AUTH_COOKIE_HTTP_ONLY for the access token,
+#     # and don't rely on AUTH_COOKIE for it.
+#     # The default behavior of TokenObtainPairView is to return access token in JSON body.
+#     # Frontend will then put this into the Authorization header.
+#     'AUTH_COOKIE': "jwt-auth", # Do not set an HttpOnly cookie for the access token
+#                          # as frontend needs to read it for Authorization header.
+#     'AUTH_COOKIE_SECURE': True,
+#     'AUTH_COOKIE_HTTP_ONLY': False, # Important: Must be False if you want JS to read a cookie-based access token
+#                                    # But for this setup, we want it in JSON body, then header.
+#     'AUTH_COOKIE_SAMESITE': 'Lax',
+#     'AUTH_COOKIE_PATH': '/',
+#     'AUTH_COOKIE_DOMAIN': None, # Set to your domain (e.g., '.yourdomain.com') if needed for subdomains.
+#                                 # Leave None for localhost or if not applicable.
+
+# }
+
+# --- Important for Development/Production ---
+# For production, always use HTTPS.
+# For local development without HTTPS, you might need to temporarily set AUTH_COOKIE_SECURE to False.
+#
+# if DEBUG:
+#     SIMPLE_JWT['AUTH_COOKIE_SECURE'] = False
+#     SIMPLE_JWT['AUTH_COOKIE_REFRESH_SECURE'] = False
 
 
 AUTH_USER_MODEL = 'accounts.customUser'
@@ -204,14 +274,12 @@ EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)  # Usually False for TLS
 DEFAULT_FROM_EMAIL = 'dts.accounts@gmail.com' # The default 'from' email address for your app
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://localhost:8000",
+]
 
-CORS_ALLOW_ALL_ORIGINS = True  
-
-
-
-
-
-
+CORS_ALLOW_CREDENTIALS = True
 
 
 
@@ -220,20 +288,124 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 
 
-# # Static files (CSS, JavaScript, Images)
-# # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-# STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
-
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
 
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+
+from pathlib import Path
+from datetime import timedelta
+import environ
+import os
+
+
+# ... your existing settings ...
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',  # Required for dj-rest-auth
+
+    # Third-party apps
+    'corsheaders',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    
+    # dj-rest-auth apps
+    'dj_rest_auth',
+    'dj_rest_auth.registration',  # Optional: for registration
+    'rest_framework.authtoken',
+    
+    # Social authentication (optional)
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    'django_extensions',
+
+    # project apps
+    'accounts',
+    'companies',
+    'hr',
+    'tasks'
+]
+
+MIDDLEWARE = [
+    'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+SITE_ID = 1
+
+# REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'accounts.auth.HybridJWTAuthentication',  # Our custom auth class
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
+
+# dj-rest-auth settings
+REST_USE_JWT = True
+
+# JWT Cookie settings (for web clients)
+JWT_AUTH_COOKIE = 'jwt-auth'
+JWT_AUTH_REFRESH_COOKIE = 'jwt-refresh-token'
+JWT_AUTH_HTTPONLY = True
+JWT_AUTH_SECURE = False  # Set to True in production
+JWT_AUTH_SAMESITE = 'Lax'
+
+# SimpleJWT settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+}
+
+# allauth settings
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_USERNAME_REQUIRED = False
 
 
 

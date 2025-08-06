@@ -1,3 +1,9 @@
 /Backend/myenv/*
 /Backend/newenv/*
 /Backend/test.py
+/test-app/*
+node_modules
+icons
+test-app
+test.js
+test.py

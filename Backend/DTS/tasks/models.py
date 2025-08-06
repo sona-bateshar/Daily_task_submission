@@ -56,7 +56,13 @@ def create_or_update_user_task_profile(sender, instance, created, **kwargs):
     """
     if created:
         TaskProfile.objects.create(user=instance)
-    instance.task_profile.save()
+    else:
+        # Only try to update if a task_profile exists
+        try:
+            instance.task_profile.save()
+        except TaskProfile.DoesNotExist:
+            TaskProfile.objects.create(user=instance) # create a task profile for exesting users 
+
 
 class Task(models.Model):
     title = models.CharField(max_length=255)

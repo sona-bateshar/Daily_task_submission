@@ -22,9 +22,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
                     'is_user_active',
                     'company',
                     'branch',
-                    'role',
-                    'department',
-                    'password'
+                    'role', 
+                    'department'
                 )
         read_only_fields = (
                     'id',
