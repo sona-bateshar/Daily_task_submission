@@ -9,7 +9,7 @@ export const CompanyProfilelist = () =>
 export const Companylist = () => 
   API.get('/api/company/company');
 
-export const Branchlist = () => 
+export const getBranchList = () => 
   API.get('/api/company/branch');
 
 export const postBranch = (formdata) => 

@@ -22,7 +22,7 @@ import {
   AlertDescription,
 } from "@/components/ui/alert";
 
-import { postBranch, CompanyProfilelist } from '../../../api/company';
+import { postBranch, CompanyProfilelist } from '@/api/company';
 
 // Type for the API response
 interface BranchHead {
