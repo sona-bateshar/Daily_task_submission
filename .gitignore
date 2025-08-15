@@ -7,3 +7,5 @@ icons
 test-app
 test.js
 test.py
+/Backend/DTS/*
+/frontend/*

@@ -4,7 +4,7 @@ class CompanyProfileModelPermission(permissions.BasePermission):
     """
     Custom permission based on role and company.
     """
-
+    
     def has_object_permission(self, request, view, obj):
         if not request.user:
             return False
@@ -17,7 +17,6 @@ class CompanyProfileModelPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
-    
         if not request.user:
             return False
         if action:
@@ -52,11 +51,11 @@ class CompanyModelPermission(permissions.BasePermission):
         elif request.user.groups.filter(name='hr').exists():
             return obj == request.user.users_company_profile.company
         else:
-            return obj == request.user.users_company_profile.company and action == 'retrieve'
+            return obj == request.user.users_company_profile.company 
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
-    
+        
         if not request.user:
             return False
         if action:
@@ -95,6 +94,8 @@ class BranchModelPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
+
+        print(request.data)
     
         if not request.user:
             return False

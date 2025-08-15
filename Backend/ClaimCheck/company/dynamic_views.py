@@ -19,24 +19,19 @@ def import_all_permission_classes():
     permissions = []
     for config in apps.get_app_configs():
         try:
-            print(config.name)
             permissions_module = importlib.import_module(f"{config.name}.permissions")
 
-            print(permissions_module)
             for name, obj in inspect.getmembers(permissions_module, inspect.isclass):
                 if issubclass(obj, BasePermission) and obj is not BasePermission:
                     current_globals[name] = obj  # Now this can be used by classname in this module
                     permissions.append(obj)
         except ModuleNotFoundError:
-            print("module not fount")
             continue
-        print("")
     return permissions
     
 
 # Run this once when the module is loaded
 permissions = import_all_permission_classes()
-print(permissions)
 
 MODEL_REGISTRY = {
     'company-profile': { 
@@ -89,10 +84,10 @@ def generate_viewsets():
         read_only_fields = config.get('read_only_fields', [])
         exclude = config.get('exclude', [])
         filters = config.get('filters', [])
-        print(model.__name__, read_only_fields, exclude, filters)
         # Build the Meta class
         permission_classes = [IsAuthenticated]
         model_permission = globals().get(f"{model.__name__}ModelPermission", None)
+
         if model_permission:
             permission_classes.append(model_permission)
         
@@ -115,7 +110,6 @@ def generate_viewsets():
         
         # --- SPECIAL CASE FOR USERS ---
         if rout_name == 'user' and 'company-profile' in serializers_dict :
-            print("addint the company profile serilizer", permission_classes)
             company_profile_serializer = serializers_dict.get('company-profile', None)
             serializer_attrs['company_profile_details'] = company_profile_serializer(
                 source='users_company_profile',
@@ -129,7 +123,6 @@ def generate_viewsets():
         )
         serializers_dict[rout_name] = serializer_class
 
-        # print(model, permission_classes)
         viewset_class = type(
             f"{model.__name__}HRViewSet",
             (BaseHRViewSet,),

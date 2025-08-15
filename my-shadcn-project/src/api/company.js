@@ -1,4 +1,7 @@
 import API from './AxiosInstance';
+import {getUserDetails} from './auth';
+
+
 
 export const CompanyProfilelist = () =>
   API.get('/api/company/company-profile');
@@ -9,6 +12,17 @@ export const Companylist = () =>
 export const Branchlist = () => 
   API.get('/api/company/branch');
 
+export const postBranch = (formdata) => 
+  API.post('/api/company/branch/', formdata)
+
+export const patchBranch = (id, formData) => 
+  API.patch(`/api/company/branch/${id}/`, formData);
+
+
+export const getBranch = ( id) => 
+  API.get(`/api/company/branch/${id}/`)
+  
+
 export const Departmentlist = () => 
   API.get('/api/company/role');
 
@@ -18,8 +32,27 @@ export const Rolelist = () =>
 export const UserDetails = () =>
   API.get('/api/accounts/user');
 
-export const CompanyProfileDetails = (id = none) => 
-  API.get('/api/company/company-profile', { id });
+export async function getCompanyProfileDetails (id) {
+    if (!id) {
+        try {
+            const user_details = await getUserDetails();
+
+            console.log("User details fetched successfully:", user_details.data);
+
+            document.getElementById('username').textContent = user_details.data.username;
+
+        } catch (error) {
+            // If the promise is rejected (e.g., API returns an error)
+            // this catch block will handle it
+            console.error("Failed to fetch user details:", error);
+        }
+
+        console.error("ID is required to fetch company profile details.");
+        return Promise.reject(new Error("ID is required."));
+    }
+    
+    return API.get(`/api/company/company-profile/${id}/`);
+};
 
 export const CompanyDetails = (id = none) => 
   API.get('/api/company/company', { id });

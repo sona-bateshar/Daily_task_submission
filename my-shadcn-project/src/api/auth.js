@@ -20,9 +20,6 @@ export const refreshtoken = () =>
   );
 
 
-
-
-
 export const getUserDetails = () =>
   API.get('/api/accounts/auth/user');
 
