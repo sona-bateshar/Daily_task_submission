@@ -161,6 +161,7 @@ class Company(models.Model):
 
     class Meta:
         verbose_name_plural = "Companies" 
+        
 
     def __str__(self):
         return self.name
@@ -176,7 +177,7 @@ class Company(models.Model):
 
 
 class Branch(models.Model):
-    name = models.CharField(max_length=255, unique=True, blank=False, null=False)
+    name = models.CharField(max_length=255, blank=False, null=False)
     address = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     
@@ -196,12 +197,13 @@ class Branch(models.Model):
 
     class Meta:
         verbose_name_plural = "Branches" # Correct pluralization for admin
+        unique_together = ('company', 'name')
 
     def __str__(self):
         return self.name
 
 class Department(models.Model):
-    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
+    name = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(blank=True, null=True)
     
     head = models.OneToOneField(
@@ -221,10 +223,15 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "departments" # Correct pluralization for admin
+        unique_together = ('company', 'name')
+
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=100, unique=True, blank=False, null=False)
+    name = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(blank=True, null=True)
 
     company = models.ForeignKey(
@@ -235,6 +242,9 @@ class Role(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name_plural = "roles" # Correct pluralization for admin
+        unique_together = ('company', 'name')
 
 
 """

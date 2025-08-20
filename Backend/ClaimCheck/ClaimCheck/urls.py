@@ -23,6 +23,5 @@ urlpatterns = [
     # custom apps
     path('api/accounts/', include('accounts.urls')),
     path('api/company/', include('company.urls')),
-    # path('api/hr/', include('hr.urls')),
-    # path('api/tasks/', include('tasks.urls')),
+    path('api/task/', include('task.urls')),
 ]
