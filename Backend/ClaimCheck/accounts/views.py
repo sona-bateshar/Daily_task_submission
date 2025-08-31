@@ -102,6 +102,7 @@ class HybridLoginView(APIView):
                 path=settings.JWT_COOKIE_PATH,
             )
             
+            print(response)
             return response
         # Raise detailed error for missing or invalid header
         else:

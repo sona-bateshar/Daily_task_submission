@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'; // shadcn/ui Card components
-import { Skeleton } from '../../components/ui/skeleton'; // Assuming path to shadcn/ui Skeleton
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // shadcn/ui Card components
+import { Skeleton } from '@/components/ui/skeleton'; // Assuming path to shadcn/ui Skeleton
 import { LogoutUser } from '@/api/auth';
 import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react"
 import {
@@ -10,10 +10,16 @@ import {
   AlertTitle,
 } from "@/components/ui/alert"
 
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/context/UserContext';
+
 const App = () => {
     
   const [isLoading, setIsLoading] = useState(true);
   const [logoutStatus, setLogoutStatus] = useState({ success: false, message: '' });
+
+  const { user, setUser } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     const performLogout = async () => {
@@ -27,12 +33,8 @@ const App = () => {
         const message = response.data?.error || (isSuccess ? 'Logout successful.' : 'Logout failed.');
 
         setLogoutStatus({ success: isSuccess, message: message });
-
-        // In a real application, after successful logout:
-        // 1. Clear user session/token from local storage or cookies.
-        //    Example: localStorage.removeItem('authToken');
-        // 2. You might want to redirect to the login page after a short delay.
-        //    Example: setTimeout(() => window.location.href = '/login', 3000);
+        setUser(null);
+        router.push('/login');
       } catch (error) {
         console.error('Logout error:', error);
         // Handle cases where the API call itself fails (e.g., network error)

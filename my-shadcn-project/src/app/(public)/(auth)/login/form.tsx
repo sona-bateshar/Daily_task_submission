@@ -21,11 +21,15 @@ import {
   AlertTitle,
 } from "@/components/ui/alert"
 
+import { useUser } from '@/context/UserContext'; 
+import { getCompanyProfileDetails } from "@/api/company";
+
 export function Form({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const { setUser } = useUser();
   
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -44,10 +48,24 @@ export function Form({
       // Call your API function with the state values
       const response = await loginUser(username, password);
 
-      // Handle a successful login (e.g., store the token, redirect, etc.)
-      console.log("Login successful:", response);
+      if (response && response.data && response.data.id ) {
 
-      router.push("/dashboard"); // <--- Redirect to the dashboard
+        try{
+          const companyProfile = await getCompanyProfileDetails(response.data.id);
+
+        setUser(response.data); 
+        console.log("Login successful, user context set:", response.data.user);
+        router.push("/dashboard");
+
+        }catch (err: any){
+          console.log("Login successful but user contex failed", err);
+          const errorMessage =
+            err.response?.data?.error || err.message || "An unknown error occurred.";
+          setError(errorMessage);
+
+        }
+        
+      }
 
     } catch (err: any) {
       // Handle the error

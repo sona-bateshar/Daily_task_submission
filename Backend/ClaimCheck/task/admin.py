@@ -104,7 +104,7 @@ class TaskAdmin(ImportExportModelAdmin):
             return "No assignees"
         
         result = ", ".join([
-            assignee.user.get_full_name() or assignee.user.username 
+            assignee.user.full_name() or assignee.user.username 
             for assignee in assignees
         ])
         
@@ -122,7 +122,7 @@ class TaskAdmin(ImportExportModelAdmin):
             return "No support staff"
         
         result = ", ".join([
-            staff.user.get_full_name() or staff.user.username 
+            staff.user.full_name() or staff.user.username 
             for staff in support_staff
         ])
         

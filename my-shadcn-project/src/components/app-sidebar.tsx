@@ -13,12 +13,17 @@ import {
   IconFolder,
   IconHelp,
   IconInnerShadowTop,
-  IconListDetails,
   IconReport,
   IconSearch,
   IconSettings,
-  IconUsers,
+  IconCirclePlus, IconPlus, IconPlaylistAdd,
+  IconUsers, IconUserCircle, IconUserCog,
+  IconChecklist, IconListDetails, IconClipboardText,
+  IconMessageCircle, IconMessages, IconStars, IconMessageStar 
+
 } from "@tabler/icons-react"
+
+
 import { Building2, Users } from "lucide-react"
 
 import { NavDocuments } from "@/components/nav-documents"
@@ -34,6 +39,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Image from 'next/image';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname() // Move this inside the component
@@ -45,34 +51,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       avatar: "/avatars/shadcn.jpg",
     },
     navMain: [
-      {
-        title: "Dashboard",
-        url: "/dashboard",
-        icon: IconDashboard,
-        isActive: pathname === "/dashboard",
-      },
+      // {
+      //   title: "Dashboard",
+      //   url: "/dashboard",
+      //   icon: IconDashboard,
+      //   isActive: pathname === "/dashboard",
+      // },
       {
         title: "New Task", // add new task for the juniors
-        url: "/dashboard/task/add", // Give it a proper URL
-        icon: IconChartBar,
+        url: "/task/add", // Give it a proper URL
+        icon: IconPlus,
         isActive: pathname === "/task/add",
       },
       {
         title: "My Tasks",  // task assigned to me
-        url: "/dashboard/task", // Fix URL to match your routing
-        icon: IconListDetails,
+        url: "/task", // Fix URL to match your routing
+        icon: IconChecklist,
         isActive: pathname === "/task", // filter the task list by assigned to me.
       },
       {
         title: "Team Tasks",  // task assigned to me
-        url: "/dashboard/task", // Fix URL to match your routing
-        icon: IconListDetails,
+        url: "/task", // Fix URL to match your routing
+        icon:  IconUsers, 
         isActive: pathname === "/task", // all open tasks visiable to the persom - (owened task, assigned to them, assigned to their team )
       },
       {
         title: "Task Feedback", // give feedback on a completd task by your team
-        url: "/dashboard/task/feedback", // Give it a proper URL
-        icon: IconFolder,
+        url: "/task/feedback", // Give it a proper URL
+        icon: IconMessageStar ,
         isActive: pathname === "/task", // filter the tasks that are closed and user was either the owner or
         //  parent and not assignee of the task and there is no feedback given by the user yet on that task.
       },
@@ -198,14 +204,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem>   
+
             <SidebarMenuButton
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/dashboard">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Your App Name</span>
+                <div className="flex items-center gap-2"> {/* New container for the image and text */}
+                  <Image
+                    src="/images/logo.png"
+                    alt="Your App Logo"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                    priority
+                  />
+                  <span className="text-base font-semibold">Your App Name</span>
+                </div>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

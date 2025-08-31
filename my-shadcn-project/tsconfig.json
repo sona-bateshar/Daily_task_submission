@@ -20,7 +20,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@/utilities/*": ["./src/app/utilities/*"]
+      "@/utilities/*": ["./src/utilities/*"]
     }
   },
 

@@ -23,7 +23,7 @@ class MyUserAdmin(ImportExportModelAdmin, BaseUserAdmin):
 class CompanyProfileAdmin(ImportExportModelAdmin):
     resource_class = CompanyProfileResource
     list_display = (
-        'id', 'email', 'get_full_name', 'company', 'branch', 'role',
+        'id', 'email',  'company', 'branch', 'role',  #  'get_full_name',
         'department', 'is_active', 'parent'
     )
     search_fields = ('email', 'first_name', 'last_name')

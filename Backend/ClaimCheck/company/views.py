@@ -4,8 +4,14 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import CompanyProfileModelPermission
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from .models import Company, CompanyProfile, Role, Department, Branch
+from .serializers import CompanyProfileSerializer
 
-class BaseHRViewSet(viewsets.ModelViewSet):
+
+from rest_framework.generics import RetrieveUpdateAPIView
+
+
+class BaseModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Filters the queryset for list views to only show objects the user has object-level permission to view at 
@@ -180,49 +186,9 @@ class AdminPasswordResetView(APIView):
 
 
 
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import viewsets
-from .models import CompanyProfile # assuming your model is here
+class CompanyProfileView(RetrieveUpdateAPIView):
+    serializer_class = CompanyProfileSerializer
+    permission_classes = [IsAuthenticated]
 
-class EmployeeViewSet(viewsets.ModelViewSet):
-    queryset = CompanyProfile.objects.all()
-    # serializer_class = EmployeeSerializer
-
-    @action(detail=False, methods=['get'])
-    def latest_nomination_choices(self, request):
-        """
-        Endpoint for getting choices for creating a new Employee.
-        Accessible at /api/employees/latest_nomination_choices/
-        """
-        # Logic to get choices for the current user
-        user = request.user
-        nominations = ...  # e.g., Nomination.objects.filter(nominated_by=user)
-        choices = [{'id': nom.id, 'name': nom.full_name} for nom in nominations]
-        return Response(choices)
-
-    @action(detail=True, methods=['get'])
-    def nomination_choices(self, request, pk=None):
-        """
-        Endpoint for getting choices for editing a specific Employee.
-        Accessible at /api/employees/<id>/nomination_choices/
-        """
-        try:
-            employee = self.get_object() # get_object() uses the pk from the URL
-        except Http404:
-            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        # Logic to get choices, potentially based on the employee instance
-        # e.g., choices could include the employee's current nomination plus other valid options
-        current_nomination = employee.latest_nomination
-        
-        # Example logic: get all nominations plus the employee's current one
-        nominations = ... # e.g., Nomination.objects.filter(...)
-        
-        # Make sure the current one is always in the list if it's not already
-        choices = [{'id': nom.id, 'name': nom.full_name} for nom in nominations]
-        if current_nomination and not any(choice['id'] == current_nomination.id for choice in choices):
-            choices.append({'id': current_nomination.id, 'name': current_nomination.full_name})
-            
-        return Response(choices)
-
+    def get_object(self):
+        return self.request.user

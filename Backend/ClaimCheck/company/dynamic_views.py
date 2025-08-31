@@ -1,4 +1,4 @@
-from .views import BaseHRViewSet
+from .views import BaseModelViewSet
 from .serializers import BaseModelSerializer
 from django.apps import apps
 
@@ -125,7 +125,7 @@ def generate_viewsets():
 
         viewset_class = type(
             f"{model.__name__}HRViewSet",
-            (BaseHRViewSet,),
+            (BaseModelViewSet,),
             {
                 'model' : model,
                 'permission_classes' : permission_classes,

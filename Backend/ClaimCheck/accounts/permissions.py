@@ -10,9 +10,10 @@ class UserModelPermission(permissions.BasePermission):
         if not request.user:
             return False
         elif request.user.groups.filter(name='admin').exists():
-            return obj.users_company_peofile.company == request.user.users_company_peofile.company
+            print(obj.__dict__)
+            return obj.users_company_profile.company == request.user.users_company_profile.company
         elif request.user.groups.filter(name='hr').exists():
-            return obj.users_company_peofile.company == request.user.users_company_peofile.company
+            return obj.users_company_profile.company == request.user.users_company_profile.company
         else:
             return obj == request.user
 
