@@ -8,49 +8,7 @@ from .models import Company, CompanyProfile, Role, Department, Branch
 from .serializers import CompanyProfileSerializer
 
 
-from rest_framework.generics import RetrieveUpdateAPIView
 
-
-class BaseModelViewSet(viewsets.ModelViewSet):
-    def get_queryset(self):
-        """
-        Filters the queryset for list views to only show objects the user has object-level permission to view at 
-        """
-        queryset = super().get_queryset()
-
-        request = self.request
-        allowed_ids = set()
-        for obj in queryset:
-            try:
-                self.check_object_permissions(request, obj)
-                allowed_ids.add(obj.pk)
-            except PermissionDenied:
-                continue
-        queryset = queryset.filter(pk__in=allowed_ids)
-
-    #     query_params = self.request.query_params
-    #     orderby = query_params['order']
-    #     filter = query_params['filter']
-    #     search = query_params['search']
-    #     page = query_params['page']
-        return queryset
-    
-    def get_object(self):
-        """
-        Retrieve a single object for retrieve, update, destroy actions.
-        This method is designed to first find the object, then apply object permissions.
-        """
-        # 1. Get the primary key from the URL
-        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-        pk = self.kwargs[lookup_url_kwarg]
-        obj = get_object_or_404(super().get_queryset(), **{self.lookup_field: pk})
-
-        # 3. Check object-level permissions using DRF's built-in mechanism.
-        # This calls has_object_permission() from your UserPermission.
-        # If permission is denied, it will raise PermissionDenied (403).
-        self.check_object_permissions(self.request, obj)
-
-        return obj
 
 import random
 import string
@@ -184,11 +142,61 @@ class AdminPasswordResetView(APIView):
         # Join the characters to form the final password string
         return "".join(password_chars)
 
+class BaseModelViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        """
+        Filters the queryset for list views to only show objects the user has object-level permission to view at 
+        """
+        queryset = super().get_queryset()
 
+        request = self.request
+        allowed_ids = set()
+        for obj in queryset:
+            try:
+                self.check_object_permissions(request, obj)
+                allowed_ids.add(obj.pk)
+            except PermissionDenied:
+                continue
+        queryset = queryset.filter(pk__in=allowed_ids)
 
-class CompanyProfileView(RetrieveUpdateAPIView):
-    serializer_class = CompanyProfileSerializer
-    permission_classes = [IsAuthenticated]
-
+    #     query_params = self.request.query_params
+    #     orderby = query_params['order']
+    #     filter = query_params['filter']
+    #     search = query_params['search']
+    #     page = query_params['page']
+        return queryset
+    
     def get_object(self):
-        return self.request.user
+        """
+        Retrieve a single object for retrieve, update, destroy actions.
+        This method is designed to first find the object, then apply object permissions.
+        """
+        # 1. Get the primary key from the URL
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        pk = self.kwargs[lookup_url_kwarg]
+        obj = get_object_or_404(super().get_queryset(), **{self.lookup_field: pk})
+
+        print("getting the object:", obj)
+        # 3. Check object-level permissions using DRF's built-in mechanism.
+        # This calls has_object_permission() from your UserPermission.
+        # If permission is denied, it will raise PermissionDenied (403).
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+
+class CompanyProfileView(BaseModelViewSet):
+    serializer_class = CompanyProfileSerializer
+    permission_classes = [IsAuthenticated, CompanyProfileModelPermission]
+    queryset = CompanyProfile.objects.all()
+    
+    # def get_queryset(self):
+    #     return CompanyProfile.objects.all()
+
+    # def get_object(self):
+    #     try:
+    #         return self.request.user.users_company_Profile
+    #     except:
+    #         return None
+    
+

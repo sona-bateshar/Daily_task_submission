@@ -6,14 +6,20 @@ class CompanyProfileModelPermission(permissions.BasePermission):
     """
     
     def has_object_permission(self, request, view, obj):
-        if not request.user:
-            return False
-        elif request.user.groups.filter(name='admin').exists():
-            return obj.company == request.user.users_company_profile.company
-        elif request.user.groups.filter(name='hr').exists():
-            return obj.company == request.user.users_company_profile.company
-        else:
-            return obj.user == request.user
+        if request.user:
+            try:
+                user_company = request.user.users_company_profile.company
+            except:
+                return False
+            
+            if request.user.groups.filter(name='admin').exists():
+                return obj.company == user_company
+            elif request.user.groups.filter(name='hr').exists():
+                return obj.company == user_company
+            else:
+                return obj.user == request.user
+        
+        return False
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
@@ -44,14 +50,18 @@ class CompanyModelPermission(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if not request.user:
-            return False
-        elif request.user.groups.filter(name='admin').exists():
-            return obj == request.user.users_company_profile.company
-        elif request.user.groups.filter(name='hr').exists():
-            return obj == request.user.users_company_profile.company
-        else:
-            return obj == request.user.users_company_profile.company 
+        if request.user:
+            try:
+                user_company = request.user.users_company_profile.company
+            except:
+                return False
+            
+            if request.user.groups.filter(name='admin').exists():
+                return obj == user_company
+            elif request.user.groups.filter(name='hr').exists():
+                return obj == user_company
+        
+        return False
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
@@ -83,14 +93,19 @@ class BranchModelPermission(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if not request.user:
-            return False
-        elif request.user.groups.filter(name='admin').exists():
-            return obj.company == request.user.users_company_profile.company
-        elif request.user.groups.filter(name='hr').exists():
-            return obj.company == request.user.users_company_profile.company
-        else:
-            return obj == request.user.users_company_profile.branch
+        if request.user:
+            try:
+                user_company = request.user.users_company_profile.company
+            except:
+                return False
+            
+            if request.user.groups.filter(name='admin').exists():
+                return obj.company == user_company
+            elif request.user.groups.filter(name='hr').exists():
+                return obj.company == user_company
+        
+        return False
+
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
@@ -121,14 +136,18 @@ class DepartmentModelPermission(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if not request.user:
-            return False
-        elif request.user.groups.filter(name='admin').exists():
-            return obj.company == request.user.users_company_profile.company
-        elif request.user.groups.filter(name='hr').exists():
-            return obj.company == request.user.users_company_profile.company
-        else:
-            return obj == request.user.users_company_profile.department
+        if request.user:
+            try:
+                user_company = request.user.users_company_profile.company
+            except:
+                return False
+            
+            if request.user.groups.filter(name='admin').exists():
+                return obj.company == user_company
+            elif request.user.groups.filter(name='hr').exists():
+                return obj.company == user_company
+        
+        return False
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
@@ -157,14 +176,18 @@ class RoleModelPermission(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if not request.user:
-            return False
-        elif request.user.groups.filter(name='admin').exists():
-            return obj.company == request.user.users_company_profile.company
-        elif request.user.groups.filter(name='hr').exists():
-            return obj.company == request.user.users_company_profile.company
-        else:
-            return obj == request.user.users_company_profile.role
+        if request.user:
+            try:
+                user_company = request.user.users_company_profile.company
+            except:
+                return False
+            
+            if request.user.groups.filter(name='admin').exists():
+                return obj.company == user_company
+            elif request.user.groups.filter(name='hr').exists():
+                return obj.company == user_company
+        
+        return False
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)

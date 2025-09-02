@@ -6,16 +6,26 @@ class UserModelPermission(permissions.BasePermission):
     Custom permission based on role and company.
     """
 
-    def has_object_permission(self, request, view, obj):
-        if not request.user:
-            return False
-        elif request.user.groups.filter(name='admin').exists():
-            print(obj.__dict__)
-            return obj.users_company_profile.company == request.user.users_company_profile.company
-        elif request.user.groups.filter(name='hr').exists():
-            return obj.users_company_profile.company == request.user.users_company_profile.company
-        else:
-            return obj == request.user
+    def has_object_permission(self, request, view, obj): 
+        if request.user:
+            if obj == request.user:
+                return True
+            
+            user_company = None
+            object_company = None
+            try:
+                user_company = request.user.users_company_profile.company
+                object_company = obj.users_company_profile.company
+            except:
+                pass
+            
+            if user_company:
+                if request.user.groups.filter(name='admin').exists():
+                    return user_company == object_company
+                elif request.user.groups.filter(name='hr').exists():
+                    return user_company == object_company
+        
+        return False
 
     def has_permission(self, request, view):
         action = getattr(view, 'action', None)
@@ -40,3 +50,4 @@ class UserModelPermission(permissions.BasePermission):
                 return request.method in ['GET', 'PUT', 'PATCH']
             else:
                 return request.method in ['GET', 'PUT', 'PATCH']
+            

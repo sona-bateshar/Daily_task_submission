@@ -1,13 +1,16 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .dynamic_views import generate_viewsets
-from .views import AdminPasswordResetView
+from .views import AdminPasswordResetView, CompanyProfileView
+
 
 router = DefaultRouter()
 dynamic_viewsets = generate_viewsets()
 
 for route_name, viewset in dynamic_viewsets.items():
     router.register(f'{route_name}', viewset, basename=f'{route_name}')
+
+router.register('companyprofile', CompanyProfileView, basename= 'companyprofile')
 
 urlpatterns = [
     path('', include(router.urls)),

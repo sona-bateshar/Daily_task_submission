@@ -9,11 +9,19 @@ from django.contrib.auth import authenticate, get_user_model
 from django.conf import settings
 from django.contrib.auth.models import update_last_login
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework.generics import RetrieveUpdateAPIView
+from .serializers import UserSerializer
 
 User = get_user_model()
 
 from rest_framework.exceptions import ValidationError
 
+class UserView(RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
        
         

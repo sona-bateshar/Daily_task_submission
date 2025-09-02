@@ -1,5 +1,5 @@
-from rest_framework import serializers
 from .models import Company, CompanyProfile, Branch, Department, Role
+from rest_framework import  serializers
 
 class BaseModelSerializer(serializers.ModelSerializer):
     
@@ -21,34 +21,44 @@ class BaseModelSerializer(serializers.ModelSerializer):
     
 
 
+
 class CompanyProfileSerializer(BaseModelSerializer):
-    class meta:
+    # These fields will be used for nested, read-only representation in API responses
+    company_details = serializers.SerializerMethodField()
+    branch_details = serializers.SerializerMethodField()
+    department_details = serializers.SerializerMethodField()
+    role_details = serializers.SerializerMethodField()
+    parent_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CompanyProfile
         read_only = ["user", "email", "first_name","middle_name" ,"last_name" ,"date_joined",  "company", "branch", "department", "role", "parent", "full_name" ]
         exclude = ["is_active"]
     
-    def get_company(self):
-        return {
-            "id" : self.company.id, 
-            "name": self.company.name
-        }
-    def get_department(self):
-        return {
-            "id" : self.department.id, 
-            "name": self.department.name
-        }
-    def get_role(self):
-        return {
-            "id" : self.role.id, 
-            "name": self.role.name
-        }
-    def get_parent(self):
-        return {
-            "id" : self.parent.id, 
-            "name": self.parent.name
-        }
-    def get_user(self):
-        return {
-            "id" : self.user.id, 
-            "name": self.user.username
-        }
+    # Custom methods for fetching the nested data for each foreign key
+    def get_company_details(self, obj):
+        if obj.company:
+            return {"id": obj.company.id, "name": obj.company.name}
+        return None
+
+    def get_branch_details(self, obj):
+        if obj.branch:
+            return {"id": obj.branch.id, "name": obj.branch.name}
+        return None
+    
+    def get_department_details(self, obj):
+        if obj.department:
+            return {"id": obj.department.id, "name": obj.department.name}
+        return None
+
+    def get_role_details(self, obj):
+        if obj.role:
+            return {"id": obj.role.id, "name": obj.role.name}
+        return None
+    
+    def get_parent_details(self, obj):
+        if obj.parent:
+            return {"id": obj.parent.id, "full_name": obj.parent.full_name}
+        return None
         
+

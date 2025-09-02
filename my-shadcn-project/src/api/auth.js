@@ -20,8 +20,11 @@ export const refreshtoken = () =>
   );
 
 
-export const getUserDetails = () =>
-  API.get('/api/accounts/auth/user');
+export const getUser = () =>
+  API.get('/api/accounts/user');
+
+export const patchUser = (formData) =>
+  API.patch('/api/accounts/user', formData);
 
 
 export const PassworChangeAPI = (formData) => 

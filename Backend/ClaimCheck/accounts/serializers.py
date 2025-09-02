@@ -5,6 +5,17 @@ from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, Bl
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError, TokenBackendError
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import serializers
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [ 'id', 'username', 'first_name',  'last_name', 'email',  'date_joined',  'is_active', 'groups']
+        read_only = ['id', 'username', 'first_name',  'last_name', 'email',  'date_joined',  'is_active', 'groups']
 
 
 class PasswordChangeSerializer(serializers.Serializer):
@@ -81,8 +92,15 @@ class PasswordChangeSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.save()
 
+        self.logout_from_all_devices(self.validated_data.get('logout_from_all_devices', False))
+
+        return user
+    
+    def logout_from_all_devices(self, logout_from_all_devices = False ):
         # blacklist all refresh tokens issued to the user
-        if self.validated_data.get('logout_from_all_devices'):
+
+        user = self.instance 
+        if logout_from_all_devices:
             tokens = OutstandingToken.objects.filter(user=user)
 
             for outstanding_token in tokens:
@@ -99,5 +117,5 @@ class PasswordChangeSerializer(serializers.Serializer):
                 except Exception as e:
                     return Response({'error': 'Unexpected error'}, status=500)
 
-        return user
+
 
