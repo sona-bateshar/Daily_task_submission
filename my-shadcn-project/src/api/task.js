@@ -1,7 +1,7 @@
 import API from './AxiosInstance';
 
 export const postTask = (FormData) =>
-  API.post('/api/task/task', FormData);
+  API.post('/api/task/task/', FormData);
 
 
 export const patchTask = (id, FormData) => 

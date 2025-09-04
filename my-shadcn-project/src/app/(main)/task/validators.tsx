@@ -12,8 +12,7 @@ export const taskFormSchema = z.object({
     .optional()
     .or(z.literal("")),
   actions_required: z.array(z.string()),
-  owner: z.number()
-    .min(1, "Owner is required"), // This ensures owner must be greater than 0
+  owner: z.number(),
   assignees: z.array(z.number()),
   supporting_staff: z.array(z.number()),
   status: z.enum(["open", "closed"]),
@@ -23,6 +22,7 @@ export const taskFormSchema = z.object({
       const selectedDate = new Date(date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      selectedDate.setHours(0, 0, 0, 0);
       return selectedDate >= today;
     }, "Due date cannot be in the past"),
 });

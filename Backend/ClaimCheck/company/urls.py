@@ -10,10 +10,12 @@ dynamic_viewsets = generate_viewsets()
 for route_name, viewset in dynamic_viewsets.items():
     router.register(f'{route_name}', viewset, basename=f'{route_name}')
 
-router.register('companyprofile', CompanyProfileView, basename= 'companyprofile')
+# router.register('companyprofile', CompanyProfileView, basename= 'companyprofile')
 
 urlpatterns = [
     path('', include(router.urls)),
     path('users/<int:pk>/password_reset/', AdminPasswordResetView.as_view(), name='admin-password-reset'),
+    path('companyprofile/', CompanyProfileView.as_view(), name='companyprofile'),
+
 
 ]

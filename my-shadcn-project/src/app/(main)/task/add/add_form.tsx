@@ -36,6 +36,9 @@ import { CompanyProfilelist } from '@/api/company';
 import { postTask } from '@/api/task';
 import TagInput from "@/components/TagInput"
 
+import { useUser } from '@/context/UserContext'; 
+
+
 
 // Type for the API response (CompanyProfile)
 interface CompanyProfile {
@@ -100,6 +103,7 @@ export function AddForm() {
     },
   });
 
+  const {user} = useUser()
   // State management
   const [companyProfiles, setCompanyProfiles] = React.useState<ComboboxOption[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -147,9 +151,13 @@ export function AddForm() {
       addAction();
     }
   };
-
+  
   // Form submission handler
   const onSubmit = async (formdata: TaskFormValues) => {
+    
+    if (user){
+        formdata.owner = user.id
+    }
     console.log("🚀 Task form submit triggered!");
     console.log("📝 Task form data received:", formdata);
 
@@ -255,6 +263,7 @@ export function AddForm() {
             )}
           />
 
+          
           {/* Actions Required Field */}
           <FormField
             control={form.control}
@@ -264,9 +273,9 @@ export function AddForm() {
                 <FormLabel>Actions Required</FormLabel>
                 <FormControl>
                   <TagInput
-                    // label="Actions Required"
                     placeholder="Add an action item..."
-                    initialTags={actionsRequired}
+                    value={field.value || []} // Pass the form field value
+                    onChange={field.onChange} // Pass the form field onChange
                     maxTags={10}
                   />
                 </FormControl>
@@ -277,30 +286,7 @@ export function AddForm() {
 
           
 
-          {/* Owner Field */}
-          <FormField
-            control={form.control}
-            name="owner"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <FormCombobox
-                    label="Task Owner"
-                    options={companyProfiles}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    placeholder="Select task owner..."
-                    searchPlaceholder="Search by name or email..."
-                    emptyMessage="No profiles found."
-                    maxSelections={1}
-                    clearable={true}
-                    showDescription={true}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+         
 
           {/* Assignees Field */}
           <FormField
@@ -367,39 +353,12 @@ export function AddForm() {
                       { before: new Date() }  // Disable past dates
                     ]}
                   />
-                  {/* <Calendar28
-                    {...field}
-                    disabled={[
-                              { dayOfWeek: [0, 6] },
-                              { before: new Date(2025, 5, 12) }
-                            ]}
-                  /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          
-
-          {/* Due Date Field */}
-          <FormField
-            control={form.control}
-            name="due_date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Due Date</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="date" 
-                    {...field}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           {error && (
             <Alert variant="destructive">
@@ -424,10 +383,51 @@ export function AddForm() {
   );
 };
 
+// {/* Actions Required Field */}
+//           <FormField
+//             control={form.control}
+//             name="actions_required"
+//             render={({ field }) => (
+//               <FormItem>
+//                 <FormLabel>Actions Required</FormLabel>
+//                 <FormControl>
+//                   <TagInput
+//                     // label="Actions Required"
+//                     placeholder="Add an action item..."
+//                     initialTags={actionsRequired}
+//                     maxTags={10}
+//                   />
+//                 </FormControl>
+//                 <FormMessage />
+//               </FormItem>
+//             )}
+//           />
 
 
-
-
+//  {/* Owner Field */}
+//           <FormField
+//             control={form.control}
+//             name="owner"
+//             render={({ field }) => (
+//               <FormItem>
+//                 <FormControl>
+//                   <FormCombobox
+//                     label="Task Owner"
+//                     options={companyProfiles}
+//                     value={field.value}
+//                     onValueChange={field.onChange}
+//                     placeholder="Select task owner..."
+//                     searchPlaceholder="Search by name or email..."
+//                     emptyMessage="No profiles found."
+//                     maxSelections={1}
+//                     clearable={true}
+//                     showDescription={true}
+//                   />
+//                 </FormControl>
+//                 <FormMessage />
+//               </FormItem>
+//             )}
+//           />
 
 
 // {/* Status Field */}

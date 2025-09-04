@@ -40,14 +40,17 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Image from 'next/image';
+import { useUser } from '@/context/UserContext'; 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname() // Move this inside the component
+  const {user} = useUser()
 
   const data = {
     user: {
-      name: "Your Name", // Customize this
-      email: "your@email.com", // Customize this
+      name: user?.first_name,
+      email: user?.email,
+      
       avatar: "/avatars/shadcn.jpg",
     },
     navMain: [

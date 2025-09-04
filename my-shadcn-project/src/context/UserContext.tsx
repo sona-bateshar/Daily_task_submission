@@ -1,18 +1,62 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation'; // Import useRouter and usePathname
+import { useRouter } from 'next/navigation';
+import { getCompanyProfileDetails } from "@/api/company";
 
-// Define the shape of the user data
-interface User {
-  id: string;
-  username: string;
+// Interfaces for the nested objects
+interface CompanyDetails {
+  id: number;
+  name: string;
 }
 
-// Define the shape of the context value
+interface BranchDetails {
+  id: number;
+  name: string;
+}
+
+interface DepartmentDetails {
+  id: number;
+  name: string;
+}
+
+interface RoleDetails {
+  id: number;
+  name: string;
+}
+
+interface ParentDetails {
+  id: number;
+  full_name: string;
+}
+
+interface User {
+  id: number;
+  company_details: CompanyDetails;
+  branch_details: BranchDetails;
+  department_details: DepartmentDetails;
+  role_details: RoleDetails;
+  parent_details: ParentDetails;
+  email: string;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  phone_number: string;
+  date_of_birth: string;
+  date_joined: string;
+  user: number;
+  company: number;
+  branch: number;
+  role: number;
+  department: number;
+  parent: number;
+}
+
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
+  isLoading: boolean;
+  checkAuth: () => Promise<void>;
 }
 
 // Create the context
@@ -21,23 +65,45 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 // Create the context provider component
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const router = useRouter();
-  const pathname = usePathname();
 
-  useEffect(() => {
-    // Define the public routes that do not require authentication
-    const publicRoutes = ['/login', '/register', '/']; 
-
-    // Check if the current path is a public route
-    const isPublicRoute = publicRoutes.includes(pathname);
-
-    // If there is no user and the current page is not a public route, redirect to the login page
-    if (!user && !isPublicRoute) {
-      router.push('/login');
+  const checkAuth = async () => {
+    try {
+      setIsLoading(true);
+      const companyProfile = await getCompanyProfileDetails();
+      
+      if (companyProfile?.data) {
+        setUser(companyProfile.data);
+        console.log("Auth check successful, user context set:", companyProfile.data);
+      } else {
+        setUser(null);
+        console.log("No user data received");
+      }
+    } catch (err: any) {
+      console.log("User context auth check failed", err);
+      setUser(null);
+      
+      // Only redirect to login if we get an authentication error
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        router.push("/login");
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, [user, router, pathname]);
+  };
 
-  const value = { user, setUser };
+  // Check authentication on component mount
+  useEffect(() => {
+    checkAuth();
+  }, []); // Empty dependency array - only runs once on mount
+
+  const value = { 
+    user, 
+    setUser, 
+    isLoading,
+    checkAuth 
+  };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from .models import Company, CompanyProfile, Role, Department, Branch
 from .serializers import CompanyProfileSerializer
+from rest_framework.generics import RetrieveUpdateAPIView
 
 
 
@@ -185,18 +186,14 @@ class BaseModelViewSet(viewsets.ModelViewSet):
         return obj
 
 
-class CompanyProfileView(BaseModelViewSet):
+class CompanyProfileView(RetrieveUpdateAPIView):
     serializer_class = CompanyProfileSerializer
-    permission_classes = [IsAuthenticated, CompanyProfileModelPermission]
-    queryset = CompanyProfile.objects.all()
-    
-    # def get_queryset(self):
-    #     return CompanyProfile.objects.all()
+    permission_classes = [IsAuthenticated]
 
-    # def get_object(self):
-    #     try:
-    #         return self.request.user.users_company_Profile
-    #     except:
-    #         return None
+    def get_object(self):
+        try:
+            return self.request.user.users_company_profile
+        except:
+            return None
     
 

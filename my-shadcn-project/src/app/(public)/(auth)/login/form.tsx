@@ -47,25 +47,8 @@ export function Form({
     try {
       // Call your API function with the state values
       const response = await loginUser(username, password);
-
-      if (response && response.data && response.data.id ) {
-
-        try{
-          const companyProfile = await getCompanyProfileDetails(response.data.id);
-
-        setUser(response.data); 
-        console.log("Login successful, user context set:", response.data.user);
-        router.push("/dashboard");
-
-        }catch (err: any){
-          console.log("Login successful but user contex failed", err);
-          const errorMessage =
-            err.response?.data?.error || err.message || "An unknown error occurred.";
-          setError(errorMessage);
-
-        }
-        
-      }
+      console.log("Login successful", response);
+      router.push("/dashboard");
 
     } catch (err: any) {
       // Handle the error

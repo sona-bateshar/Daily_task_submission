@@ -98,7 +98,11 @@ class CompanyProfile(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.full_name if self.full_name else self.user.username
+        if self.full_name:
+            return self.full_name
+        else :
+            return self.user.username
+        # return self.full_name if self.full_name else self.user.username
     
     @property
     def get_ancestors(self):
