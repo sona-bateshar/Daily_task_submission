@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { taskFormSchema, type TaskFormValues } from "../validators";
+import { taskFormSchema, type TaskFormValues } from "./interfaces";
 
 // Import our utilities
 import { processDataToFormOptions, type FormOption } from "@/utilities/processDataToFormOptions";
@@ -33,10 +33,13 @@ import {
 } from "@/components/ui/alert";
 
 import { CompanyProfilelist } from '@/api/company';
-import { postTask } from '@/api/task';
+import { patchTask, postTask } from '@/api/task';
 import TagInput from "@/components/TagInput"
 
 import { useUser } from '@/context/UserContext'; 
+import { group } from 'console';
+import { UseFormReturn } from "react-hook-form"
+import { type Task, mapTaskToFormValues, TaskInterface} from "./interfaces";
 
 
 
@@ -87,32 +90,52 @@ const getCompanyProfileOptions = async (): Promise<ComboboxOption[]> => {
   }
 }; 
 
-export function AddForm() {
+
+
+export function TaskForm({
+  task,
+  add,
+}: {
+  task?: TaskInterface;
+  add?: boolean;
+}) {
+  console.log("TAsk, add", task, add)
+  const EMPTY_FORM_VALUES: TaskFormValues = {
+    id: undefined,
+    title: "",
+    description: "",
+    actions_required: [],
+    owner: 0,
+    assignees: [],
+    supporting_staff: [],
+    status: "open",
+    due_date: "",
+  }
+
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
-    defaultValues: {
-      id: undefined,
-      title: "",
-      description: "",
-      actions_required: [], // Changed from undefined to []
-      owner: 0, // Changed from undefined to 0 (will need validation)
-      assignees: [], // Changed from undefined to []
-      supporting_staff: [], // Changed from undefined to []
-      status: "open",
-      due_date: "",
-    },
-  });
+    defaultValues: task ? mapTaskToFormValues(task) :  EMPTY_FORM_VALUES,
+  })
 
+  
   const {user} = useUser()
   // State management
   const [companyProfiles, setCompanyProfiles] = React.useState<ComboboxOption[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [actionInput, setActionInput] = useState("");
 
-  // Fetch company profiles on component mount
+  const [error, setErrorRaw] = useState<string | null>(null);
+  const setError = (val: string | null) =>
+    setErrorRaw(val ? val.substring(0, 50) : null);
+
+  if (add){
+    form.setValue("owner", user.id); 
+
+  }
+  
+  
   React.useEffect(() => {
     const fetchCompanyProfiles = async () => {
       try {
@@ -151,6 +174,9 @@ export function AddForm() {
       addAction();
     }
   };
+
+  console.log("add", add)
+
   
   // Form submission handler
   const onSubmit = async (formdata: TaskFormValues) => {
@@ -166,22 +192,24 @@ export function AddForm() {
     setSuccessMessage(null);
     
     try {
-      const response = await postTask(formdata);
+      
+      const response = add? await postTask(formdata) : await patchTask(formdata.id , formdata);
+      setSuccessMessage(response.data?.message || add? "Task added successfully!": "Task edited successfully!");
+      
       console.log("✅ API response:", response);
 
-      setSuccessMessage(response.data?.message || "Task added successfully!");
-      form.reset({
-        id: undefined,
-        title: "",
-        description: "",
-        actions_required: [],
-        owner: 0,
-        assignees: [],
-        supporting_staff: [],
-        status: "open",
-        due_date: "",
-      });
-      setActionInput("");
+      // form.reset({
+      //   id: undefined,
+      //   title: "",
+      //   description: "",
+      //   actions_required: [],
+      //   owner: 0,
+      //   assignees: [],
+      //   supporting_staff: [],
+      //   status: "open",
+      //   due_date: "",
+      // });
+      // setActionInput("");
       
     } catch (err: any) {
       console.error("❌ API error:", err);
@@ -225,8 +253,6 @@ export function AddForm() {
 
   return (
     <div className="space-y-6">
-      <h2>Add New Task</h2>
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Task Title Field */}
@@ -284,7 +310,31 @@ export function AddForm() {
             )}
           />
 
-          
+           {/* Owner Field */}
+          <FormField
+            control={form.control}
+            name="owner"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <FormCombobox
+                    label="Task Owner"
+                    options={companyProfiles}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="Select task owner..."
+                    searchPlaceholder="Search by name or email..."
+                    emptyMessage="No profiles found."
+                    maxSelections={1}
+                    clearable={true}
+                    showDescription={true}
+                    disabled = {user?.user_details.groups.filter(group => group.id === 1 || group.id === 2).length !=0 }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
          
 
@@ -366,89 +416,20 @@ export function AddForm() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
-          {successMessage && (
-            <Alert>
-              <CheckCircle2Icon />
-              <AlertDescription>{successMessage}</AlertDescription>
+          <div className='text-[var(--constructive)]' >  
+            {successMessage && (
+            <Alert className='text-[var(--constructive)]' >
+              <CheckCircle2Icon className='text-[var(--constructive)]' />
+              <AlertDescription className='text-[var(--constructive)]' >{successMessage}</AlertDescription>
             </Alert>
           )}
+          </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Adding task..." : "Add Task"}
+            {loading ? "Saving task..." : "Save Task"}
           </Button>
         </form>
       </Form>
     </div>
   );
 };
-
-// {/* Actions Required Field */}
-//           <FormField
-//             control={form.control}
-//             name="actions_required"
-//             render={({ field }) => (
-//               <FormItem>
-//                 <FormLabel>Actions Required</FormLabel>
-//                 <FormControl>
-//                   <TagInput
-//                     // label="Actions Required"
-//                     placeholder="Add an action item..."
-//                     initialTags={actionsRequired}
-//                     maxTags={10}
-//                   />
-//                 </FormControl>
-//                 <FormMessage />
-//               </FormItem>
-//             )}
-//           />
-
-
-//  {/* Owner Field */}
-//           <FormField
-//             control={form.control}
-//             name="owner"
-//             render={({ field }) => (
-//               <FormItem>
-//                 <FormControl>
-//                   <FormCombobox
-//                     label="Task Owner"
-//                     options={companyProfiles}
-//                     value={field.value}
-//                     onValueChange={field.onChange}
-//                     placeholder="Select task owner..."
-//                     searchPlaceholder="Search by name or email..."
-//                     emptyMessage="No profiles found."
-//                     maxSelections={1}
-//                     clearable={true}
-//                     showDescription={true}
-//                   />
-//                 </FormControl>
-//                 <FormMessage />
-//               </FormItem>
-//             )}
-//           />
-
-
-// {/* Status Field */}
-//           <FormField
-//             control={form.control}
-//             name="status"
-//             render={({ field }) => (
-//               <FormItem>
-//                 <FormLabel>Status</FormLabel>
-//                 <FormControl>
-//                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-//                     <SelectTrigger>
-//                       <SelectValue placeholder="Select status" />
-//                     </SelectTrigger>
-//                     <SelectContent>
-//                       <SelectItem value="open">Open</SelectItem>
-//                       <SelectItem value="closed">Closed</SelectItem>
-//                     </SelectContent>
-//                   </Select>
-//                 </FormControl>
-//                 <FormMessage />
-//               </FormItem>
-//             )}
-//           />

@@ -29,6 +29,7 @@ class CompanyProfileSerializer(BaseModelSerializer):
     department_details = serializers.SerializerMethodField()
     role_details = serializers.SerializerMethodField()
     parent_details = serializers.SerializerMethodField()
+    user_details = serializers.SerializerMethodField() 
 
     class Meta:
         model = CompanyProfile
@@ -60,5 +61,29 @@ class CompanyProfileSerializer(BaseModelSerializer):
         if obj.parent:
             return {"id": obj.parent.id, "full_name": obj.parent.full_name}
         return None
+    
+    def get_user_details(self, obj):
+        user = obj.user
+        groups = []
+
+        for group in obj.user.groups.all():
+            groups.append(
+                {
+                    "id" : group.id, 
+                    "name" : group.name
+                }
+            )
+
+
+
+        if user:
+            return {
+                    'id': user.id,
+                    'username': user.username,
+                    'email' : getattr(user, 'email', ''),
+                    'first_name': getattr(user, 'first_name', ''),
+                    'last_name': getattr(user, 'last_name', ''),
+                    'groups' : groups,
+                }
         
 

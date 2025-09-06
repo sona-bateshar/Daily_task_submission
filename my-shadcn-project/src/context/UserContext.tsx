@@ -30,6 +30,22 @@ interface ParentDetails {
   full_name: string;
 }
 
+interface groups {
+  id: number;
+  name: string;
+}
+
+interface UserDetails {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  groups: groups[];
+}
+
+
+
 interface User {
   id: number;
   company_details: CompanyDetails;
@@ -37,6 +53,7 @@ interface User {
   department_details: DepartmentDetails;
   role_details: RoleDetails;
   parent_details: ParentDetails;
+  user_details:UserDetails;
   email: string;
   first_name: string;
   middle_name: string;
@@ -50,6 +67,7 @@ interface User {
   role: number;
   department: number;
   parent: number;
+
 }
 
 interface UserContextType {

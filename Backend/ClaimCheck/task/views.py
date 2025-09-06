@@ -1,6 +1,8 @@
 from gc import get_objects
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from .permissions import TaskModelPermission
+# from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -9,23 +11,23 @@ from .serializers import TaskSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, TaskModelPermission ]
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
+    # filter_backends = [DjangoFilterBackend]
+
+
+    ordering_fields = '__all__'
+    ordering = ['due_date']
 
     def get_queryset(self):
         """
         Dynamically filters the Task queryset based on URL query parameters,
         handling the new, more complex filtering logic.
         """
-        # Start with the default queryset from the ViewSet
-        queryset = super().get_queryset()
+
+        queryset = Task.objects.filter(**self.request.GET.dict())
         user = self.request.user
-
-        query_params = self.request.query_params
-
-        if query_params.get("assigned_to_me"):
-            return queryset.filter(assignee = user.company_profile)
     
         request = self.request
         allowed_ids = []
@@ -54,6 +56,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         # 3. Check object-level permissions using DRF's built-in mechanism.
         # This calls has_object_permission() from your UserPermission.
         # If permission is denied, it will raise PermissionDenied (403).
+
+        print(obj, self.request.data)
         self.check_object_permissions(self.request, obj)
 
         return obj

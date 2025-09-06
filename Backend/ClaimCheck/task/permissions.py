@@ -7,23 +7,28 @@ class TaskModelPermission(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if not request.user:
-            return False
+        if request.user:
+            try:
+                user_company = request.user.users_company_profile.company
+            except:
+                return False
+            
+            if request.user.groups.filter(name='admin').exists():
+                return obj.owner.company == user_company
+            elif request.user.groups.filter(name='hr').exists():
+                return obj.owner.company == user_company
+            else:
+                if request.method == "POST":
+                    return True
         
-        if request.user.groups.filter(name_in=['admin', 'hr']).exists():
-                return obj.owner.company == request.user.company
-
-        if request.method == "POST":
-            return True
+                if request.method in ['PUT', 'PATCH']:
+                    return request.user.users_company_profile == obj.owener
         
-        if request.method in ['PUT', 'PATCH']:
-            return request.user == obj.owener
-        
-        if request.method in ['GET']:
-            return request.user == obj.owener \
-                or obj.assignees.filter(pk=request.user.pk).exists() \
-                or obj.supporting_staff.filter(pk=request.user.pk).exists() \
-                or obj.owener.parents.filter(pk=request.user.pk).exists() 
+                elif request.method in ['GET']:
+                    return request.user.users_company_profile == obj.owener \
+                        or obj.assignees.filter(pk=request.user.users_company_profile.pk).exists() \
+                        or obj.supporting_staff.filter(pk=request.user.users_company_profile.pk).exists() \
+                        or obj.owener.parents.filter(pk=request.user.users_company_profile.pk).exists() 
 
         return False
 
@@ -48,7 +53,7 @@ class ReviewModelPermission(permissions.BasePermission):
         if not request.user:
             return False
         
-        if request.user.groups.filter(name_in=['admin', 'hr']).exists():
+        if request.user.groups.filter(name__in=['admin', 'hr']).exists():
                 return obj.owner.company == request.user.company
 
         if request.method == "POST":

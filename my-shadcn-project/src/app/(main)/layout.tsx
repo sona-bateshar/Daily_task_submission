@@ -61,10 +61,17 @@ export default function MainLayout({
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col items-center px-4 sm:px-6 lg:px-8 py-6">
+            <div className="w-full max-w-xl flex flex-col gap-4 md:gap-6">
+              {children}
+            </div>
+          </div>
+        </div>
+        {/* <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             {children}
           </div>
-        </div>
+        </div> */}
       </SidebarInset>
     </SidebarProvider>
   );

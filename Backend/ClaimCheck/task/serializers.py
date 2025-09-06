@@ -8,10 +8,47 @@ class TaskSerializer(serializers.ModelSerializer):
     # assignees = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
     # supporting_staff = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
 
+    assignees_details = serializers.SerializerMethodField()
+    supporting_staff_details = serializers.SerializerMethodField()
+    owner_details = serializers.SerializerMethodField()
+
     class Meta:
         model = Task
         fields = '__all__'
 
+    def get_assignees_details(self, obj):
+        assignees_details = []
+
+        for assignee in obj.assignees.all():
+            assignees_details.append( 
+                {
+                    "id" : assignee.id, 
+                    "email" : assignee.email, 
+                    "full_name": assignee.full_name
+                }
+            )
+        
+        return assignees_details
+    
+    def get_supporting_staff_details(self, obj):
+        supporting_staff_details = []
+
+        for staff in obj.supporting_staff.all():
+            supporting_staff_details.append( 
+                {
+                    "id" : staff.id, 
+                    "email" : staff.email, 
+                    "full_name": staff.full_name
+                }
+            )
+        
+        return supporting_staff_details
+    
+    def get_owner_details(self, obj):
+        if obj.owner:
+            return {"id": obj.owner.id, "email" : obj.owner.email,  "full_name": obj.owner.full_name}
+        return None
+    
     def validate(self, data):
         """
         Validate that assignees and supporting staff belong to the owner's company.
@@ -34,7 +71,7 @@ class TaskSerializer(serializers.ModelSerializer):
         for assignee in assignees:
             if assignee.company != owner_company:
                 raise serializers.ValidationError(
-                    {"assignees": f"Assignee '{assignee.username}' does not belong to the owner's company."}
+                    {"assignees": f"Assignee '{assignee.full_name}' does not belong to the owner's company."}
                 )
 
         # Validate supporting staff
@@ -42,7 +79,7 @@ class TaskSerializer(serializers.ModelSerializer):
         for staff in supporting_staff:
             if staff.company != owner_company:
                 raise serializers.ValidationError(
-                    {"supporting_staff": f"Supporting staff member '{staff.username}' does not belong to the owner's company."}
+                    {"supporting_staff": f"Supporting staff member '{staff.full_name}' does not belong to the owner's company."}
                 )
 
         # Prevent edits if the task is closed.
