@@ -15,7 +15,7 @@ interface Calendar28Props extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 // Helper function to format date for display (dd-mm-yyyy)
-const formatDateForDisplay = (date: Date | undefined): string => {
+export const formatDateForDisplay = (date: Date | undefined): string => {
   if (!date) return ""
   
   const day = date.getDate().toString().padStart(2, '0')
@@ -59,6 +59,7 @@ const parseDateFromDisplay = (dateString: string): Date | null => {
     date.getFullYear() === year &&
     isValidDate(date)
   ) {
+    
     return date
   }
   
@@ -66,7 +67,7 @@ const parseDateFromDisplay = (dateString: string): Date | null => {
 }
 
 // Helper function to parse yyyy-mm-dd format (from form value)
-const parseDateFromValue = (dateString: string): Date | null => {
+export const parseDateFromValue = (dateString: string): Date | null => {
   const parts = dateString.split('-')
   if (parts.length !== 3) return null
   
@@ -95,10 +96,10 @@ const Calendar28 = React.forwardRef<HTMLInputElement, Calendar28Props>(
     
     // Parse initial date from value (yyyy-mm-dd format)
     const initialDate = value ? parseDateFromValue(value.toString()) : undefined
-    const [date, setDate] = React.useState<Date | undefined>(initialDate)
+    const [date, setDate] = React.useState<Date | undefined>(initialDate ?? undefined)
     const [month, setMonth] = React.useState<Date>(initialDate || new Date())
     const [inputValue, setInputValue] = React.useState(
-      formatDateForDisplay(initialDate)
+      formatDateForDisplay(initialDate ?? undefined)
     )
 
     // Sync with external value changes

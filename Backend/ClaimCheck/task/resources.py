@@ -1,7 +1,7 @@
 from import_export import resources, fields
 from import_export.widgets import DateWidget, BooleanWidget, Widget, ForeignKeyWidget
 from company.models import CompanyProfile
-from .models import Task, Review, TaskUpdates
+from .models import Task, Review , Comment
 import json
 
 
@@ -33,7 +33,9 @@ class EmailListWidget(Widget):
         
         return profiles
     
-    def render(self, value, obj=None):
+    
+    
+    def render(self, value, obj=None, *args, **kwargs):
         """Render the value for export"""
         if not value:
             return ""
@@ -76,7 +78,7 @@ class SingleEmailWidget(Widget):
             print(f"Warning: CompanyProfile with email {value} not found")
             return None
     
-    def render(self, value, obj=None):
+    def render(self, value, obj=None, *args, **kwargs):
         """Render the value for export"""
         if not value:
             return ""
@@ -108,7 +110,7 @@ class ActionsRequiredWidget(Widget):
         else:
             return []
     
-    def render(self, value, obj=None):
+    def render(self, value, obj=None, *args, **kwargs):
         """Render the value for export"""
         if not value:
             return ""
@@ -162,11 +164,18 @@ class TaskResource(resources.ModelResource):
             'owner_email', 'assignees_emails', 'supporting_staff_emails',
             'status', 'due_date', 'discarted'
         )
+
+
         # Remove import_id_fields if your CSV doesn't have an 'id' column
         # Or make sure your CSV/JSON has an 'id' column
         import_id_fields = ('id',)
         skip_unchanged = True
         report_skipped = True
+
+        export_fields = ['id', 'title', 'description', 
+                         'actions_required',
+                        'owner__email', 'get_assignees__email',
+                        'status', 'due_date', 'discarted']
     
     def before_import_row(self, row, **kwargs):
         """Pre-process row data before import"""
@@ -230,7 +239,7 @@ class ReviewResource(resources.ModelResource):
             'id', 'task', 'reviewer', 'rating', 'description',
         )
 
-class TaskUpdatesResource(resources.ModelResource):
+class CommentResource(resources.ModelResource):
     user = fields.Field(
         column_name='user_email',
         attribute='user',
@@ -238,10 +247,11 @@ class TaskUpdatesResource(resources.ModelResource):
     )
 
     class Meta:
-        model = TaskUpdates
+        model = Comment
         fields = (
             'id', 'task', 'user', 'description',
         )
         export_order = (
             'id', 'task', 'user', 'description',
         )
+

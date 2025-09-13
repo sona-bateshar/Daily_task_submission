@@ -67,6 +67,7 @@ interface User {
   role: number;
   department: number;
   parent: number;
+  full_name : string ;
 
 }
 

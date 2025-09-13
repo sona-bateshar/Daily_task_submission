@@ -80,3 +80,45 @@ class ReviewModelPermission(permissions.BasePermission):
             return False
         return True
 
+class CommentModelPermission(permissions.BasePermission):
+    """
+    Custom permission based on role and company.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.user:
+            try:
+                user_company = request.user.users_company_profile.company
+            except:
+                return False
+            
+            if request.user.groups.filter(name='admin').exists():
+                return obj.user.company == user_company
+            elif request.user.groups.filter(name='hr').exists():
+                return obj.user.company == user_company
+            else:
+                if request.method == "POST":
+                    return True
+        
+                if request.method in ['PUT', 'PATCH']:
+                    return request.user.users_company_profile == obj.user
+        
+                elif request.method in ['GET', "POST"]:
+                    return request.user.users_company_profile == obj.task.owener \
+                        or obj.task.assignees.filter(pk=request.user.users_company_profile.pk).exists() \
+                        or obj.task.supporting_staff.filter(pk=request.user.users_company_profile.pk).exists() \
+                        or obj.task.owener.parents.filter(pk=request.user.users_company_profile.pk).exists() 
+
+        return False
+
+
+
+    def has_permission(self, request, view):
+        action = getattr(view, 'action', None)
+    
+        if not request.user:
+            return False
+        
+        if request.method in ['GET', 'POST', 'PUT', 'PATCH']:
+            return True
+        return False

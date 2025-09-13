@@ -3,11 +3,15 @@ import { z } from "zod";
 
 
 // A lightweight user reference
-interface UserDetails {
+export interface UserDetails {
   id: number;
   email: string;
   full_name: string;
 }
+
+
+
+export const TASK_STATUS_OPTIONS = ["open", "closed", "in_progress"] as const;
 
 // A single Task object
 export interface TaskInterface {
@@ -18,7 +22,8 @@ export interface TaskInterface {
   title: string;
   description: string | null;
   actions_required: string[];
-  status: "open" | "closed" | "in_progress" ; 
+  status :  typeof TASK_STATUS_OPTIONS[number];
+  // status: "open" | "closed" | "in_progress" ; 
   created_at: string; 
   updated_at: string;  
   due_date: string;   
@@ -33,6 +38,7 @@ export type Task = TaskInterface;
 
 export type TaskResponse = Task[];
 
+type TaskStatus = TaskInterface["status"];
 
 
 
@@ -49,7 +55,7 @@ export const taskFormSchema = z.object({
   owner: z.number(),
   assignees: z.array(z.number()),
   supporting_staff: z.array(z.number()),
-  status: z.enum(["open", "closed", "in_progress"]),
+  status: z.enum(TASK_STATUS_OPTIONS),
   due_date: z.string()
     .min(1, "Due date is required")
     .refine((date) => {
@@ -80,3 +86,5 @@ export function mapTaskToFormValues(task: Task): TaskFormValues {
   
     return form_values
 }
+
+

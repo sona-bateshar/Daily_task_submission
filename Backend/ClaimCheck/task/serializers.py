@@ -1,7 +1,12 @@
 # your_app/serializers.py
 from rest_framework import serializers
-from .models import Task
-from django.contrib.auth.models import User
+from .models import Task, Comment
+from django.db.models import Q
+from django.contrib.auth import get_user_model
+from rest_framework.serializers import ValidationError
+
+
+User = get_user_model()
 
 class TaskSerializer(serializers.ModelSerializer):
     # Use a SerializerMethodField for read-only relationships if needed
@@ -87,3 +92,73 @@ class TaskSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"status": "Cannot edit a closed task."})
 
         return data
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+    def get_user_details(self, obj):
+        if obj.user:
+            return {"id": obj.user.id, "email" : obj.user.email,  "full_name": obj.user.full_name}
+        return None
+    
+    # def validate(self, data):
+    #     """
+    #     Validate that assignees and supporting staff belong to the owner's company.
+    #     """
+    #     task_id = data.get('task')
+    #     if task_id is None:
+    #         if self.instance:
+    #             # We're updating, and the task field wasn't changed.
+    #             # Use the existing task instance for validation.
+    #             task = self.instance.task
+    #         else:
+    #             # We're creating a new object, and no task was provided.
+    #             # This is an error, as the task field is likely required.
+    #             raise ValidationError("Task ID is required.")
+    #     else:
+    #         # 3. A new task ID was provided, so fetch the corresponding instance.
+    #         try:
+    #             task = Task.objects.get(pk=task_id)
+    #         except Task.DoesNotExist:
+    #             raise ValidationError("Invalid task ID.")
+            
+    #     comment_user_id = data.get('user')
+    #     if comment_user_id is None:
+    #         if self.instance:
+    #             comment_user = self.instance.user
+    #         else:
+    #             raise ValidationError("User ID is required.")
+    #     else:
+    #         try:
+    #             comment_user = User.objects.get(pk=comment_user_id)
+    #         except User.DoesNotExist:
+    #             raise ValidationError("Invalid user ID.")
+
+
+    #     task_users = (
+    #             task.assignees.all()
+    #             | task.supporting_staff.all()
+    #             | User.objects.filter(pk=task.owner.pk) if task.owner else User.objects.none()
+    #             | User.objects.filter(pk=task.owner.parent.pk) if task.owner and task.owner.parent else User.objects.none()
+    #         )
+
+    #     if not comment_user:
+    #         raise serializers.ValidationError({"user": "A comment must have an user."})
+        
+    #     if not task:
+    #         raise serializers.ValidationError({"task": "A comment must have a task."})
+        
+    #     if comment_user not in task_users:
+    #         raise serializers.ValidationError({"user": "Comment can only be given by the task owner, assignee, or supporting staff"})
+
+    #     # Prevent edits if the task is closed.
+    #     if self.instance and self.instance.task and self.instance.task.status  == 'closed':
+    #         raise serializers.ValidationError({"task": "Cannot edit a closed task's comment."})
+
+    #     return data
+    

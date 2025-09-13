@@ -1,8 +1,8 @@
 # your_app/admin.py
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from .models import Task, Review, TaskUpdates
-from .resources import TaskResource, ReviewResource, TaskUpdatesResource
+from .models import Task, Review  # , TaskUpdates
+from .resources import TaskResource, ReviewResource   #, TaskUpdatesResource
 
 # @admin.register(Task)
 # class TaskAdmin(ImportExportModelAdmin):
@@ -21,8 +21,8 @@ from django.utils.html import format_html
 from django.db.models import Count
 from django.utils import timezone
 from import_export.admin import ImportExportModelAdmin
-from .models import Task
-from .resources import TaskResource
+from .models import Task, Comment, Review
+from .resources import TaskResource, ReviewResource,  CommentResource
 
 @admin.register(Task)
 class TaskAdmin(ImportExportModelAdmin):
@@ -211,21 +211,16 @@ class ReviewAdmin(ImportExportModelAdmin):
         'id', 'task', 'reviewer', 'rating', 'created_at'
     )
     list_filter = ('rating', 'created_at')
-    search_fields = ('task__title', 'reviewer__email')
+    search_fields = ('task__id', 'task__title', 'reviewer__email')
     raw_id_fields = ('task', 'reviewer')
 
-@admin.register(TaskUpdates)
+@admin.register(Comment)
 class TaskUpdatesAdmin(ImportExportModelAdmin):
-    resource_class = TaskUpdatesResource
+    resource_class = CommentResource
     list_display = (
-        'id', 'task', 'user', 'created_at'
+        'id', 'task', 'user', 'created_at', 'description'
     )
     list_filter = ('created_at',)
-    search_fields = ('task__title', 'user__email')
+    search_fields = ('task__id', 'task__title', 'user__email')
     raw_id_fields = ('task', 'user')
 
-# Make sure to also import and register any other admin classes
-# from the previous code if they are in the same admin.py file.
-# from .models import Company, Branch, ...
-# @admin.register(Company)
-# ...

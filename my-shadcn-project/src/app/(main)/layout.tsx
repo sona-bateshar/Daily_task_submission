@@ -10,6 +10,10 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from '@/context/UserContext';
 import { PopcornIcon } from 'lucide-react'; 
+import { DataTable } from "@/components/data-table"
+import data from "../(main)/dashboard/data.json"
+
+
 
 export default function MainLayout({
   children,
@@ -60,19 +64,12 @@ export default function MainLayout({
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col items-center px-4 sm:px-6 lg:px-8 py-6">
-            <div className="w-full max-w-xl flex flex-col gap-4 md:gap-6">
-              {children}
-            </div>
-          </div>
+        <div className="@container/main items-center w-full max-w-10xl px-6 py-6 sm:px-6 sm:py-6 md:px-6 md:py-6 lg:px-6 lg:py-6">
+          {children}
         </div>
-        {/* <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            {children}
-          </div>
-        </div> */}
       </SidebarInset>
     </SidebarProvider>
   );
 }
+
+//sm:px-0 md:gap-0 lg:px-8  

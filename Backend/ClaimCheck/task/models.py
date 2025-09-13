@@ -62,7 +62,7 @@ class Task(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.title} ({self.status})"
+        return f"{self.title}"
 
 
 class Review(models.Model):
@@ -105,17 +105,21 @@ class Review(models.Model):
     def __str__(self):
         return f"Review for {self.task.title} by {self.reviewer}"
     
-class TaskUpdates(models.Model):
+class Comment(models.Model):
     task = models.ForeignKey(
         Task,
         on_delete=models.CASCADE,
-        related_name='task_updates'
+        related_name='task_comments',
+        null=False,
+        blank=False
     )
 
     user = models.ForeignKey(
         'company.CompanyProfile', 
         on_delete=models.CASCADE,
-        related_name='task_updates'
+        related_name='task_comments',
+        null=False,
+        blank=False
     )
 
     description = models.TextField(max_length=10000, blank=True)
@@ -127,13 +131,13 @@ class TaskUpdates(models.Model):
         if (self.user != self.task.owner and 
             self.user not in self.task.assignees.all() and 
             self.user not in self.task.supporting_staff.all()):
-            raise ValidationError("Update must be given by the task owner, assignee, or supporting staff")
+            raise ValidationError("Comment can only be given by the task owner, assignee, or supporting staff")
     
     def save(self, *args, **kwargs):
         self.full_clean()  # trigger the validation
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"update for {self.task.title} by {self.user}"
+        return f"comment for {self.task} by {self.user}"
 
 

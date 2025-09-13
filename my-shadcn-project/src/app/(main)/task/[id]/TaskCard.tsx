@@ -1,12 +1,23 @@
-import React from 'react';
-import { Calendar, User, Users, Clock, Edit3, CheckCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, User, Users, Clock, Edit3, CheckCircle, AlertCircle, ParkingMeter, EditIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from "@/components/ui/separator"
 import { Badge } from '@/components/ui/badge';
+import { Task, TaskInterface, UserDetails } from '../interfaces';
+import CommentPage  from '../../(comment)/page';
+// import { CommentPage } from '../../(comment)/page'; 
+import { useParams } from 'next/navigation';
+import { TaskStatusBadge } from '../functions';
+import { TaskDetails } from '../TaskDetails';
 
-export const TaskCard = ({task}) => {
+export const TaskCard = ({
+  task,
+}: {
+  task: TaskInterface;
+}) => {
   // Format date helper function
-  const formatDate = (dateString) => {
+  const formatDate = (dateString : string) => {
     if (!dateString) return 'Not set';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -16,7 +27,7 @@ export const TaskCard = ({task}) => {
   };
 
   // Format datetime helper function
-  const formatDateTime = (dateString) => {
+  const formatDateTime = (dateString : string) => {
     if (!dateString) return 'Not set';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -27,22 +38,10 @@ export const TaskCard = ({task}) => {
     });
   };
 
-  // Get status variant
-  const getStatusVariant = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'open':
-        return 'default';
-      case 'closed':
-        return 'secondary';
-      case 'in_progress':
-        return 'outline';
-      default:
-        return 'secondary';
-    }
-  };
+
 
   // Person card component
-  const PersonCard = ({ person }) => (
+  const PersonCard = ({person} : {person : UserDetails}) => (
     <Card className="h-full">
       <CardContent className="p-4">
         <div className="flex items-center gap-2 mb-1">
@@ -55,224 +54,48 @@ export const TaskCard = ({task}) => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Card className="shadow-lg">
-        {/* Header with Edit Button */}
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <CardTitle className="text-2xl mb-2">{task.title}</CardTitle>
-              <div className="flex items-center gap-4">
-                <Badge variant={getStatusVariant(task.status)} className="gap-1">
-                  {task.status === 'open' && <AlertCircle className="w-4 h-4" />}
-                  {task.status === 'closed' && <CheckCircle className="w-4 h-4" />}
-                  {task.status?.charAt(0).toUpperCase() + task.status?.slice(1).replace('_', ' ')}
-                </Badge>
-                <span className="text-sm text-muted-foreground">ID: {task.id}</span>
-              </div>
-            </div>
-            <Button  className="gap-2">
-              <Edit3 className="w-4 h-4" />
-              Edit Task
-            </Button>
+    <div className="flex flex-col gap-6 max-w-4xl mx-auto">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <CardTitle className="text-3xl mb-2">
+            {task.title} <span className="font-thin text-muted-foreground leading-relaxed">#{task.id}</span>
+          </CardTitle>
+          <div className="flex items-center gap-4">
+            <TaskStatusBadge status={task.status} />
           </div>
-        </CardHeader>
+        </div>
+        <Button  
+          className="gap-2"
+          variant={"ghost"}
+        >
+          <EditIcon className="w-6 h-6" />
+        </Button>
+        
+      </div >
+      
+      <p className="flex flex-col gap-2 text-sm"><Separator /> {task.description}</p>
 
-        <CardContent className="space-y-6">
-          {/* Description */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Description</h3>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-muted-foreground leading-relaxed">
-                  {task.description || 'No description provided'}
-                </p>
-              </CardContent>
-            </Card>
+      <div className="flex flex-col md:flex-row gap-6">
+          
+          {/* Component 2: This is the fixed-width component.
+            On mobile, it fills the full width (`w-full`) and is displayed first due to its order in the DOM.
+            On desktop, it has a fixed width of 250px (`md:w-[250px]`) and is moved to the second position using `md:order-2`.
+          */}
+          <div className="w-full md:w-[250px] md:order-2 transition-all duration-300 ease-in-out">
+            <TaskDetails task ={task }  />
           </div>
-
-          {/* Date Information - Single Row */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Timeline</h3>
-            <Card>
-              <CardContent className="p-4">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-blue-500" />
-                    <div>
-                      <span className="font-medium text-sm">Due Date</span>
-                      <p className="text-sm text-muted-foreground">{formatDate(task.due_date)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-green-500" />
-                    <div>
-                      <span className="font-medium text-sm">Created</span>
-                      <p className="text-sm text-muted-foreground">{formatDateTime(task.created_at)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-purple-500" />
-                    <div>
-                      <span className="font-medium text-sm">Updated</span>
-                      <p className="text-sm text-muted-foreground">{formatDateTime(task.updated_at)}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          
+          {/* Component 1: This is the flexible component.
+            On mobile, it fills the full width (`w-full`) and is displayed second.
+            On desktop, it uses `flex-grow` to fill the remaining space and is moved to the first position using `md:order-1`.
+          */}
+          <div className="w-full md:flex-grow md:order-1   transition-all duration-300 ease-in-out">
+            <CommentPage {...task }  />
           </div>
+        </div>
 
-          {/* Owner */}
-          {task.owner_details && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Task Owner
-              </h3>
-              <div className="max-w-sm">
-                <PersonCard person={task.owner_details} />
-              </div>
-            </div>
-          )}
-
-          {/* Assignees */}
-          {task.assignees_details && task.assignees_details.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Assignees ({task.assignees_details.length})
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {task.assignees_details.map((assignee) => (
-                  <PersonCard key={assignee.id} person={assignee} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Supporting Staff */}
-          {task.supporting_staff_details && task.supporting_staff_details.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Supporting Staff ({task.supporting_staff_details.length})
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {task.supporting_staff_details.map((staff) => (
-                  <PersonCard key={staff.id} person={staff} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Actions Required */}
-          {task.actions_required && task.actions_required.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Actions Required</h3>
-              <Card className="border-amber-200 bg-amber-50">
-                <CardContent className="p-4">
-                  <ul className="list-disc list-inside space-y-1">
-                    {task.actions_required.map((action, index) => (
-                      <li key={index} className="text-amber-800">{action}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Additional Info */}
-          {task.closed_at && (
-            <Card className="border-green-200 bg-green-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="font-medium text-green-900">Task Closed</span>
-                </div>
-                <span className="text-green-800 text-sm">{formatDateTime(task.closed_at)}</span>
-              </CardContent>
-            </Card>
-          )}
-        </CardContent>
-      </Card>
+      
+      
     </div>
   );
 };
-
-// Example usage component
-const ExampleUsage = () => {
-  const sampleTask = {
-    "id": 21,
-    "assignees_details": [
-      {
-        "id": 1,
-        "email": "john.doe@example.com",
-        "full_name": "John  Doe"
-      },
-      {
-        "id": 6,
-        "email": "emily.davis_alt@example.com",
-        "full_name": "Emily  Davis"
-      },
-      {
-        "id": 11,
-        "email": "ryan.anderson_alt@example.com",
-        "full_name": "Ryan  Anderson"
-      },
-      {
-        "id": 16,
-        "email": "elizabeth.martin_alt@example.com",
-        "full_name": "Elizabeth  Martin"
-      },
-      {
-        "id": 21,
-        "email": "scott.hernandez_alt@example.com",
-        "full_name": "Scott  Hernandez"
-      }
-    ],
-    "supporting_staff_details": [
-      {
-        "id": 6,
-        "email": "emily.davis_alt@example.com",
-        "full_name": "Emily  Davis"
-      },
-      {
-        "id": 16,
-        "email": "elizabeth.martin_alt@example.com",
-        "full_name": "Elizabeth  Martin"
-      }
-    ],
-    "owner_details": {
-      "id": 51,
-      "email": "sonabateshar1999@gmail.com",
-      "full_name": "Sona  Batesar"
-    },
-    "title": "sfghfsgjdgj",
-    "description": "madjlhgfjadkltherio;gmndm,gnfd aeri nk na fjl; mxcclkvho; asdlkk lk;j dslk fslkf dslf hweopfjkfhasd",
-    "actions_required": [],
-    "status": "open",
-    "created_at": "2025-09-03T09:05:30.107871Z",
-    "updated_at": "2025-09-03T09:05:30.107898Z",
-    "due_date": "2025-09-10",
-    "closed_at": null,
-    "discarted": false,
-    "owner": 51,
-    "assignees": [1, 6, 11, 16, 21],
-    "supporting_staff": [6, 16]
-  };
-
-  const handleEdit = () => {
-    alert('Edit button clicked! You would navigate to edit mode here.');
-  };
-
-  return (
-    <div className="min-h-screen bg-background p-8">
-      <TaskDisplay task={sampleTask} onEdit={handleEdit} />
-    </div>
-  );
-};
-
-export default ExampleUsage;
