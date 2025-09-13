@@ -1,6 +1,5 @@
 // import * as React from "react"
 
-
 // export  function TaskTable(){
 //     return (
 //         <div className="flex flex-1 flex-col">  haha </div>
@@ -8,8 +7,8 @@
 
 // }
 
-"use client"
-import * as React from "react"
+"use client";
+import * as React from "react";
 import {
   closestCenter,
   DndContext,
@@ -20,15 +19,15 @@ import {
   useSensors,
   type DragEndEvent,
   type UniqueIdentifier,
-} from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   IconChevronDown,
   IconChevronLeft,
@@ -42,7 +41,7 @@ import {
   IconLoader,
   IconPlus,
   IconTrendingUp,
-} from "@tabler/icons-react"
+} from "@tabler/icons-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -57,20 +56,20 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { toast } from "sonner"
-import { email, z } from "zod"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+} from "@tanstack/react-table";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { toast } from "sonner";
+import { email, z } from "zod";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/components/ui/chart";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
   DrawerClose,
@@ -80,7 +79,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "@/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -88,17 +87,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -106,19 +105,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
-
-
-
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
 // Zod schema for the UserDetails object
 const userDetailsSchema = z.object({
@@ -156,7 +147,7 @@ export const taskSchema = z.object({
 function DragHandle({ id }: { id: number }) {
   const { attributes, listeners } = useSortable({
     id,
-  })
+  });
   return (
     <Button
       {...attributes}
@@ -168,42 +159,54 @@ function DragHandle({ id }: { id: number }) {
       <IconGripVertical className="text-muted-foreground size-3" />
       <span className="sr-only">Drag to reorder</span>
     </Button>
-  )
+  );
 }
 
 const getInitials = (name: string) => {
   return name
-    .split(' ')
-    .map(word => word.charAt(0))
-    .join('')
+    .split(" ")
+    .map((word) => word.charAt(0))
+    .join("")
     .toUpperCase()
     .slice(0, 2);
-}
+};
 
 const getStatusBadge = (status: string) => {
   const statusConfig = {
-    open: { variant: "destructive" as const, label: 'Open' },
-    in_progress: { variant: "default" as const, label: 'In Progress' },
-    completed: { variant: "secondary" as const, label: 'Completed' },
-    closed: { variant: "outline" as const, label: 'Closed' }
+    open: { variant: "destructive" as const, label: "Open" },
+    in_progress: { variant: "default" as const, label: "In Progress" },
+    completed: { variant: "secondary" as const, label: "Completed" },
+    closed: { variant: "outline" as const, label: "Closed" },
   };
-  
-  const config = statusConfig[status as keyof typeof statusConfig] || { variant: "outline" as const, label: status };
+
+  const config = statusConfig[status as keyof typeof statusConfig] || {
+    variant: "outline" as const,
+    label: status,
+  };
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };
 
-const renderPersonList = (people: Array<{ id: number; full_name: string }>, maxDisplay = 2) => {
-  if (!people || people.length === 0) return <span className="text-muted-foreground">None</span>;
-  
+const renderPersonList = (
+  people: Array<{ id: number; full_name: string }>,
+  maxDisplay = 2
+) => {
+  if (!people || people.length === 0)
+    return <span className="text-muted-foreground">None</span>;
+
   const displayPeople = people.slice(0, maxDisplay);
   const remainingCount = people.length - maxDisplay;
-  
+
   return (
     <div className="flex flex-wrap gap-1">
       {displayPeople.map((person) => (
-        <div key={person.id} className="flex items-center gap-1 bg-muted rounded-md px-2 py-1 text-xs">
+        <div
+          key={person.id}
+          className="flex items-center gap-1 bg-muted rounded-md px-2 py-1 text-xs"
+        >
           <Avatar className="h-4 w-4">
-            <AvatarFallback className="text-xs">{getInitials(person.full_name)}</AvatarFallback>
+            <AvatarFallback className="text-xs">
+              {getInitials(person.full_name)}
+            </AvatarFallback>
           </Avatar>
           {/* <span className="truncate max-w-20" title={person.full_name}>
             {person.full_name}
@@ -220,11 +223,11 @@ const renderPersonList = (people: Array<{ id: number; full_name: string }>, maxD
 };
 
 const formatDate = (dateString: string) => {
-  if (!dateString) return '-';
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
+  if (!dateString) return "-";
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 };
 
@@ -273,7 +276,10 @@ const columns: ColumnDef<z.infer<typeof taskSchema>>[] = [
         <div className="font-medium truncate" title={row.getValue("title")}>
           {row.getValue("title")}
         </div>
-        <div className="text-xs text-muted-foreground truncate mt-1" title={row.original.description}>
+        <div
+          className="text-xs text-muted-foreground truncate mt-1"
+          title={row.original.description}
+        >
           {row.original.description}
         </div>
       </div>
@@ -302,7 +308,9 @@ const columns: ColumnDef<z.infer<typeof taskSchema>>[] = [
     accessorKey: "assignees_details",
     header: "Assignees",
     cell: ({ row }) => {
-      const assignees = row.getValue("assignees_details") as Task["assignees_details"];
+      const assignees = row.getValue(
+        "assignees_details"
+      ) as Task["assignees_details"];
       return renderPersonList(assignees);
     },
   },
@@ -310,7 +318,9 @@ const columns: ColumnDef<z.infer<typeof taskSchema>>[] = [
     accessorKey: "supporting_staff_details",
     header: "Supporting Staff",
     cell: ({ row }) => {
-      const supportingStaff = row.getValue("supporting_staff_details") as Task["supporting_staff_details"];
+      const supportingStaff = row.getValue(
+        "supporting_staff_details"
+      ) as Task["supporting_staff_details"];
       return renderPersonList(supportingStaff);
     },
   },
@@ -325,7 +335,7 @@ const columns: ColumnDef<z.infer<typeof taskSchema>>[] = [
           Due Date
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => <div>{formatDate(row.getValue("due_date"))}</div>,
   },
@@ -334,43 +344,41 @@ const columns: ColumnDef<z.infer<typeof taskSchema>>[] = [
     header: "Status",
     cell: ({ row }) => getStatusBadge(row.getValue("status")),
   },
-//   {
-//     id: "actions",
-//     enableHiding: false,
-//     cell: ({ row }) => {
-//       const task = row.original
+  //   {
+  //     id: "actions",
+  //     enableHiding: false,
+  //     cell: ({ row }) => {
+  //       const task = row.original
 
-//       return (
-//         <DropdownMenu>
-//           <DropdownMenuTrigger asChild>
-//             <Button variant="ghost" className="h-8 w-8 p-0">
-//               <span className="sr-only">Open menu</span>
-//               <MoreHorizontal className="h-4 w-4" />
-//             </Button>
-//           </DropdownMenuTrigger>
-//           <DropdownMenuContent align="end">
-//             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-//             <DropdownMenuItem
-//               onClick={() => navigator.clipboard.writeText(task.id.toString())}
-//             >
-//               Copy task ID
-//             </DropdownMenuItem>
-//             <DropdownMenuSeparator />
-//             <DropdownMenuItem>View details</DropdownMenuItem>
-//             <DropdownMenuItem>Edit task</DropdownMenuItem>
-//           </DropdownMenuContent>
-//         </DropdownMenu>
-//       )
-//     },
-//   },
-
-]
-
+  //       return (
+  //         <DropdownMenu>
+  //           <DropdownMenuTrigger asChild>
+  //             <Button variant="ghost" className="h-8 w-8 p-0">
+  //               <span className="sr-only">Open menu</span>
+  //               <MoreHorizontal className="h-4 w-4" />
+  //             </Button>
+  //           </DropdownMenuTrigger>
+  //           <DropdownMenuContent align="end">
+  //             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //             <DropdownMenuItem
+  //               onClick={() => navigator.clipboard.writeText(task.id.toString())}
+  //             >
+  //               Copy task ID
+  //             </DropdownMenuItem>
+  //             <DropdownMenuSeparator />
+  //             <DropdownMenuItem>View details</DropdownMenuItem>
+  //             <DropdownMenuItem>Edit task</DropdownMenuItem>
+  //           </DropdownMenuContent>
+  //         </DropdownMenu>
+  //       )
+  //     },
+  //   },
+];
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof taskSchema>> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
-  })
+  });
   return (
     <TableRow
       data-state={row.getIsSelected() && "selected"}
@@ -388,36 +396,36 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof taskSchema>> }) {
         </TableCell>
       ))}
     </TableRow>
-  )
+  );
 }
 
 export function TaskTable({
   data: initialData,
 }: {
-  data: z.infer<typeof taskSchema>[]
+  data: z.infer<typeof taskSchema>[];
 }) {
-  const [data, setData] = React.useState(() => initialData)
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [data, setData] = React.useState(() => initialData);
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
-  })
-  const sortableId = React.useId()
+  });
+  const sortableId = React.useId();
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {})
-  )
+  );
   const dataIds = React.useMemo<UniqueIdentifier[]>(
     () => data?.map(({ id }) => id) || [],
     [data]
-  )
+  );
   const table = useReactTable({
     data,
     columns,
@@ -441,15 +449,15 @@ export function TaskTable({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
+    const { active, over } = event;
     if (active && over && active.id !== over.id) {
       setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id)
-        const newIndex = dataIds.indexOf(over.id)
-        return arrayMove(data, oldIndex, newIndex)
-      })
+        const oldIndex = dataIds.indexOf(active.id);
+        const newIndex = dataIds.indexOf(over.id);
+        return arrayMove(data, oldIndex, newIndex);
+      });
     }
   }
 
@@ -517,7 +525,7 @@ export function TaskTable({
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
-                  )
+                  );
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -553,7 +561,7 @@ export function TaskTable({
                                 header.getContext()
                               )}
                         </TableHead>
-                      )
+                      );
                     })}
                   </TableRow>
                 ))}
@@ -595,7 +603,7 @@ export function TaskTable({
               <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {
-                  table.setPageSize(Number(value))
+                  table.setPageSize(Number(value));
                 }}
               >
                 <SelectTrigger size="sm" className="w-20" id="rows-per-page">
@@ -676,10 +684,8 @@ export function TaskTable({
         <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
       </TabsContent>
     </Tabs>
-  )
+  );
 }
-
-
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -688,7 +694,7 @@ const chartData = [
   { month: "April", desktop: 73, mobile: 190 },
   { month: "May", desktop: 209, mobile: 130 },
   { month: "June", desktop: 214, mobile: 140 },
-]
+];
 const chartConfig = {
   desktop: {
     label: "Desktop",
@@ -698,10 +704,10 @@ const chartConfig = {
     label: "Mobile",
     color: "var(--primary)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 function TableCellViewer({ item }: { item: z.infer<typeof taskSchema> }) {
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
@@ -855,5 +861,5 @@ function TableCellViewer({ item }: { item: z.infer<typeof taskSchema> }) {
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

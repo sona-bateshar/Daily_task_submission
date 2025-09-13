@@ -1,4 +1,10 @@
-import { Form } from "./form"
+"use client";
+
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
+import { PopcornIcon } from "lucide-react";
+import { Form } from "./form";
 
 export default function Page() {
   return (
@@ -7,5 +13,5 @@ export default function Page() {
         <Form />
       </div>
     </div>
-  )
+  );
 }

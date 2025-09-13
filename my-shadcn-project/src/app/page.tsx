@@ -1,6 +1,9 @@
+"use client";
+
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {Form} from "@/app/(public)/(auth)/login/form"
+import { Form } from "@/app/(public)/(auth)/login/form";
 
 export default function Home() {
   return (
@@ -18,14 +21,13 @@ export default function Home() {
         </div>
       </div>
 
-      
-
       {/* Right Section: Login Component */}
       <div className="flex-1 flex items-center justify-center p-8">
         <Card className="w-full max-w-sm">
           <CardHeader className="flex flex-col items-center gap-2">
-
-            <div className="flex items-center gap-2"> {/* New container for the image and text */}
+            <div className="flex items-center gap-2">
+              {" "}
+              {/* New container for the image and text */}
               <Image
                 src="/images/logo.png"
                 alt="Your App Logo"
@@ -36,18 +38,13 @@ export default function Home() {
               />
               <span className="text-3xl font-semibold">Your App Name</span>
             </div>
-
           </CardHeader>
           <CardContent>
             {/* Login Form */}
-            <Form/>
-
+            <Form />
           </CardContent>
         </Card>
       </div>
     </div>
   );
 }
-
-
-

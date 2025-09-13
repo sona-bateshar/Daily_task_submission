@@ -1,15 +1,11 @@
 import { z } from "zod";
 
-
-
 // A lightweight user reference
 export interface UserDetails {
   id: number;
   email: string;
   full_name: string;
 }
-
-
 
 export const TASK_STATUS_OPTIONS = ["open", "closed", "in_progress"] as const;
 
@@ -22,11 +18,11 @@ export interface TaskInterface {
   title: string;
   description: string | null;
   actions_required: string[];
-  status :  typeof TASK_STATUS_OPTIONS[number];
-  // status: "open" | "closed" | "in_progress" ; 
-  created_at: string; 
-  updated_at: string;  
-  due_date: string;   
+  status: (typeof TASK_STATUS_OPTIONS)[number];
+  // status: "open" | "closed" | "in_progress" ;
+  created_at: string;
+  updated_at: string;
+  due_date: string;
   closed_at: string | null;
   discarted: boolean;
   owner: number;
@@ -40,14 +36,14 @@ export type TaskResponse = Task[];
 
 type TaskStatus = TaskInterface["status"];
 
-
-
 export const taskFormSchema = z.object({
   id: z.number().optional(),
-  title: z.string()
+  title: z
+    .string()
     .min(1, "Title is required")
     .max(255, "Title cannot exceed 255 characters"),
-  description: z.string()
+  description: z
+    .string()
     .max(10000, "Description cannot exceed 10,000 characters")
     .optional()
     .or(z.literal("")),
@@ -56,7 +52,8 @@ export const taskFormSchema = z.object({
   assignees: z.array(z.number()),
   supporting_staff: z.array(z.number()),
   status: z.enum(TASK_STATUS_OPTIONS),
-  due_date: z.string()
+  due_date: z
+    .string()
     .min(1, "Due date is required")
     .refine((date) => {
       const selectedDate = new Date(date);
@@ -69,22 +66,19 @@ export const taskFormSchema = z.object({
 
 export type TaskFormValues = z.infer<typeof taskFormSchema>;
 
-
 // Mapper: convert Task -> TaskFormValues
 export function mapTaskToFormValues(task: Task): TaskFormValues {
-    const form_values: TaskFormValues = {
-        id: task.id ?? undefined,
-        title: task.title ?? "",
-        description: task.description ?? "",
-        actions_required: task.actions_required ?? [],
-        owner: task.owner ?? 0,
-        assignees: task.assignees ?? [],
-        supporting_staff: task.supporting_staff ?? [],
-        status: task.status ?? "open",
-        due_date: task.due_date ?? ""
-      }
-  
-    return form_values
+  const form_values: TaskFormValues = {
+    id: task.id ?? undefined,
+    title: task.title ?? "",
+    description: task.description ?? "",
+    actions_required: task.actions_required ?? [],
+    owner: task.owner ?? 0,
+    assignees: task.assignees ?? [],
+    supporting_staff: task.supporting_staff ?? [],
+    status: task.status ?? "open",
+    due_date: task.due_date ?? "",
+  };
+
+  return form_values;
 }
-
-

@@ -8,12 +8,10 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from '@/context/UserContext';
-import { PopcornIcon } from 'lucide-react'; 
-import { DataTable } from "@/components/data-table"
-import data from "../(main)/dashboard/data.json"
-
-
+import { useUser } from "@/context/UserContext";
+import { PopcornIcon } from "lucide-react";
+import { DataTable } from "@/components/data-table";
+import data from "../(main)/dashboard/data.json";
 
 export default function MainLayout({
   children,
@@ -27,7 +25,7 @@ export default function MainLayout({
     // Only redirect if we're not loading and there's no user
     if (!isLoading && !user) {
       console.log("No user found, redirecting to login");
-      router.push('/login');
+      router.push("/login");
     }
   }, [user, isLoading, router]);
 
@@ -56,7 +54,7 @@ export default function MainLayout({
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--sidebar-width": "calc(var(--spacing) * 45)",
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
@@ -72,4 +70,4 @@ export default function MainLayout({
   );
 }
 
-//sm:px-0 md:gap-0 lg:px-8  
+//sm:px-0 md:gap-0 lg:px-8

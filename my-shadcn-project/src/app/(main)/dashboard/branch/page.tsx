@@ -1,14 +1,14 @@
 // app/dashboard/branch/page.tsx
-'use client'
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IconEdit } from "@tabler/icons-react";
 
 // Replace this with the actual path to your API function
-import { getBranchList } from "@/api/company"; 
+import { getBranchList } from "@/api/company";
 
 // ===============================================
 // Define Data Structures and Columns
@@ -26,13 +26,13 @@ type Branch = {
 // Define the structure for the table columns.
 // This matches the format expected by the DataTable component.
 const allColumns = [
-  { accessorKey: 'name', header: 'Branch Name' },
-  { accessorKey: 'location', header: 'Location' },
-  { accessorKey: 'manager', header: 'Manager' },
-  { accessorKey: 'phone', header: 'Phone Number' },
+  { accessorKey: "name", header: "Branch Name" },
+  { accessorKey: "location", header: "Location" },
+  { accessorKey: "manager", header: "Manager" },
+  { accessorKey: "phone", header: "Phone Number" },
   {
-    accessorKey: 'actions',
-    header: 'Actions',
+    accessorKey: "actions",
+    header: "Actions",
     // Explicitly typing the `row` parameter to resolve the TypeScript error
     cell: ({ row }: { row: { original: Branch } }) => (
       <Link href={`/dashboard/branch/edit/${row.original.id}`}>
@@ -60,9 +60,9 @@ const DataTable = ({ data, columns }) => {
         <table className="w-full caption-bottom text-sm">
           <thead className="[&_tr]:border-b">
             <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-              {columns.map(column => (
-                <th 
-                  key={column.accessorKey} 
+              {columns.map((column) => (
+                <th
+                  key={column.accessorKey}
                   className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0"
                 >
                   {column.header}
@@ -72,13 +72,18 @@ const DataTable = ({ data, columns }) => {
           </thead>
           <tbody className="[&_tr:last-child]:border-0">
             {data.map((row, rowIndex) => (
-              <tr 
-                key={rowIndex} 
+              <tr
+                key={rowIndex}
                 className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
               >
-                {columns.map(column => (
-                  <td key={column.accessorKey} className="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                    {column.cell ? column.cell({ row: { original: row } }) : row[column.accessorKey]}
+                {columns.map((column) => (
+                  <td
+                    key={column.accessorKey}
+                    className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                  >
+                    {column.cell
+                      ? column.cell({ row: { original: row } })
+                      : row[column.accessorKey]}
                   </td>
                 ))}
               </tr>
@@ -96,7 +101,7 @@ const DataTable = ({ data, columns }) => {
 
 export default function BranchPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch branch data from the API
@@ -105,7 +110,7 @@ export default function BranchPage() {
       setIsLoading(true);
       try {
         // Access the .data property of the Axios response
-        const response = await getBranchList(); 
+        const response = await getBranchList();
         setBranches(response.data);
       } catch (error) {
         console.error("Failed to fetch branches:", error);
@@ -118,7 +123,7 @@ export default function BranchPage() {
 
   // Filter the branch list based on the search term
   const filteredBranches = useMemo(() => {
-    return branches.filter(branch =>
+    return branches.filter((branch) =>
       branch.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [branches, searchTerm]);
@@ -127,7 +132,6 @@ export default function BranchPage() {
   const columnsToShow = useMemo(() => {
     return allColumns;
   }, []);
-
 
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

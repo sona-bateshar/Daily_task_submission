@@ -1,17 +1,15 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-import { DataTable } from "@/components/data-table"
+import { DataTable } from "@/components/data-table";
 
-import data from "./data.json"
+import data from "./data.json";
 
 export default function Page() {
-
-  return ( 
-    <div className="flex flex-1 flex-col w-full gap-6" >
+  return (
+    <div className="flex flex-1 flex-col w-full gap-6">
       <DataTable data={data} />
     </div>
-    
-  )
+  );
 }

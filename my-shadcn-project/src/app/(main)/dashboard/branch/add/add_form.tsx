@@ -1,28 +1,38 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { branchFormSchema, type BranchFormValues } from "./validators";
 
 // Import our utilities
-import { processDataToFormOptions, type FormOption } from "@/utilities/processDataToFormOptions";
-import { FormCombobox, type ComboboxOption } from "@/components/ui/form-combobox";
+import {
+  processDataToFormOptions,
+  type FormOption,
+} from "@/utilities/processDataToFormOptions";
+import {
+  FormCombobox,
+  type ComboboxOption,
+} from "@/components/ui/form-combobox";
 
 // Shadcn UI components
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { AutoSizeTextarea } from "@/components/ui/autosize-textarea";
 import { Button } from "@/components/ui/button";
 
 import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-import { postBranch, CompanyProfilelist } from '@/api/company';
+import { postBranch, CompanyProfilelist } from "@/api/company";
 
 // Type for the API response
 interface BranchHead {
@@ -34,19 +44,21 @@ interface BranchHead {
 }
 
 // Convert FormOption to ComboboxOption
-const convertToComboboxOptions = (formOptions: FormOption[]): ComboboxOption[] => {
-  return formOptions.map(option => ({
+const convertToComboboxOptions = (
+  formOptions: FormOption[]
+): ComboboxOption[] => {
+  return formOptions.map((option) => ({
     id: option.id,
     label: option.label,
     description: option.originalData?.email,
-    ...option.originalData // Include original data for additional access
+    ...option.originalData, // Include original data for additional access
   }));
 };
 
 // Fetch branch heads and process them
 const getBranchManagerOptions = async (): Promise<ComboboxOption[]> => {
   try {
-    const response = await CompanyProfilelist(); 
+    const response = await CompanyProfilelist();
     const branchHeads: BranchHead[] = response.data;
 
     console.log("Raw branch heads data:", branchHeads);
@@ -54,10 +66,10 @@ const getBranchManagerOptions = async (): Promise<ComboboxOption[]> => {
     // First process with our form options utility
     const formOptions = processDataToFormOptions({
       data: branchHeads,
-      idField: 'id',
-      labelFields: ['first_name', 'middle_name', 'last_name'],
-      searchFields: ['email'],
-      fallbackField: 'email'
+      idField: "id",
+      labelFields: ["first_name", "middle_name", "last_name"],
+      searchFields: ["email"],
+      fallbackField: "email",
     });
 
     // Then convert to combobox format
@@ -79,7 +91,7 @@ export function AddForm() {
       name: "",
       address: "",
       phone: "",
-      head: undefined, 
+      head: undefined,
     },
   });
 
@@ -114,17 +126,16 @@ export function AddForm() {
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
-    
+
     try {
       const response = await postBranch(formdata);
       console.log("✅ API response:", response);
 
       setSuccessMessage(response.data?.message || "Branch added successfully!");
       form.reset();
-      
     } catch (err: any) {
       console.error("❌ API error:", err);
-      
+
       const backendErrors = err.response?.data;
       let nonFieldErrors: string[] = [];
       let fieldErrorsExist = false;
@@ -144,18 +155,17 @@ export function AddForm() {
           }
         }
       }
-      
+
       if (!fieldErrorsExist && nonFieldErrors.length > 0) {
         setError(nonFieldErrors.join(", "));
       } else if (!fieldErrorsExist) {
         setError("An unknown error occurred.");
       }
-      
     } finally {
       setLoading(false);
     }
   };
-  
+
   if (isLoading) {
     return <div>Loading branch heads...</div>;
   }
@@ -189,7 +199,10 @@ export function AddForm() {
               <FormItem>
                 <FormLabel>Address</FormLabel>
                 <FormControl>
-                  <AutoSizeTextarea placeholder="e.g., 123 Main St, City, Country" {...field} />
+                  <AutoSizeTextarea
+                    placeholder="e.g., 123 Main St, City, Country"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -257,4 +270,4 @@ export function AddForm() {
       </Form>
     </div>
   );
-};
+}

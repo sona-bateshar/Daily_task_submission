@@ -1,20 +1,20 @@
 "use client";
 
-import {useState, useEffect, use}  from "react";
+import { useState, useEffect, use } from "react";
 
 import { TaskCard } from "./TaskCard";
 import { type Task } from "../interfaces";
 import { useUser } from "@/context/UserContext";
 import { getTaskDetails } from "@/api/task";
-import { PopcornIcon } from 'lucide-react'; 
+import { PopcornIcon } from "lucide-react";
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  task?: Task;                     
+  task?: Task;
 };
- 
+
 export default function Page({ params, task }: PageProps) {
-  const { id } = use(params); 
+  const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useUser();
   const [data, setData] = useState<Task | undefined>(task);
@@ -59,13 +59,11 @@ export default function Page({ params, task }: PageProps) {
   }
 
   return (
-      <div><TaskCard task={data}  /></div>
+    <div>
+      <TaskCard task={data} />
+    </div>
   );
 }
-
-
-
-
 
 // "use client"
 
@@ -73,12 +71,11 @@ export default function Page({ params, task }: PageProps) {
 // import {TaskCard} from './TaskCard'
 // import { type Task } from "../../interfaces";
 
-
 // type PageProps = {
 //   params: Promise<{ id: string }>;
-//   task?: Task;                     
+//   task?: Task;
 // };
- 
+
 // export default function Page({ params, task }: PageProps) {
 //   const { id } = use(params);     const task_eg = {
 //         "id": 21,
@@ -149,9 +146,6 @@ export default function Page({ params, task }: PageProps) {
 //         ]
 //     }
 
-
-
-
 //   return (
 //     <div className="flex flex-1 flex-col">
 //         <div className="@container/main flex flex-1 flex-col gap-2">
@@ -162,4 +156,3 @@ export default function Page({ params, task }: PageProps) {
 //     </div>
 //   )
 // }
-

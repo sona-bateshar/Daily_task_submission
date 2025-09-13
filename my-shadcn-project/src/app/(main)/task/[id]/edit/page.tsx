@@ -1,19 +1,19 @@
 "use client";
-import {useState, useEffect, use}  from "react";
+import { useState, useEffect, use } from "react";
 
-import { TaskForm } from "../../TaskForm"
+import { TaskForm } from "../../TaskForm";
 import { type Task } from "../../interfaces";
 import { useUser } from "@/context/UserContext";
 import { getTaskDetails } from "@/api/task";
-import { PopcornIcon } from 'lucide-react'; 
+import { PopcornIcon } from "lucide-react";
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  task?: Task;                     
+  task?: Task;
 };
 
 export default function Page({ params, task }: PageProps) {
-  const { id } = use(params); 
+  const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useUser();
   const [data, setData] = useState<Task | undefined>(task);
@@ -60,8 +60,7 @@ export default function Page({ params, task }: PageProps) {
   return (
     <div>
       <h1>Edit Task, {id}</h1>
-      <TaskForm add={false} task={data}  />
+      <TaskForm add={false} task={data} />
     </div>
   );
 }
-

@@ -1,22 +1,35 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { taskFormSchema, type TaskFormValues } from "./interfaces";
 
 // Import our utilities
-import { processDataToFormOptions, type FormOption } from "@/utilities/processDataToFormOptions";
-import { FormCombobox, type ComboboxOption } from "@/components/ui/form-combobox";
+import {
+  processDataToFormOptions,
+  type FormOption,
+} from "@/utilities/processDataToFormOptions";
+import {
+  FormCombobox,
+  type ComboboxOption,
+} from "@/components/ui/form-combobox";
 
 // Shadcn UI components
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { AutoSizeTextarea } from "@/components/ui/autosize-textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import Calendar28 from "@/components/calendar-28"
+import Calendar28 from "@/components/calendar-28";
 import { X } from "lucide-react";
 import {
   Select,
@@ -27,21 +40,16 @@ import {
 } from "@/components/ui/select";
 
 import { AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
-import {
-  Alert,
-  AlertDescription,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-import { CompanyProfilelist } from '@/api/company';
-import { patchTask, postTask } from '@/api/task';
-import TagInput from "@/components/TagInput"
+import { CompanyProfilelist } from "@/api/company";
+import { patchTask, postTask } from "@/api/task";
+import TagInput from "@/components/TagInput";
 
-import { useUser } from '@/context/UserContext'; 
-import { group } from 'console';
-import { UseFormReturn } from "react-hook-form"
-import { type Task, mapTaskToFormValues, TaskInterface} from "./interfaces";
-
-
+import { useUser } from "@/context/UserContext";
+import { group } from "console";
+import { UseFormReturn } from "react-hook-form";
+import { type Task, mapTaskToFormValues, TaskInterface } from "./interfaces";
 
 // Type for the API response (CompanyProfile)
 interface CompanyProfile {
@@ -53,19 +61,21 @@ interface CompanyProfile {
 }
 
 // Convert FormOption to ComboboxOption
-const convertToComboboxOptions = (formOptions: FormOption[]): ComboboxOption[] => {
-  return formOptions.map(option => ({
+const convertToComboboxOptions = (
+  formOptions: FormOption[]
+): ComboboxOption[] => {
+  return formOptions.map((option) => ({
     id: option.id,
     label: option.label,
     description: option.originalData?.email,
-    ...option.originalData // Include original data for additional access
+    ...option.originalData, // Include original data for additional access
   }));
 };
 
 // Fetch company profiles and process them
 const getCompanyProfileOptions = async (): Promise<ComboboxOption[]> => {
   try {
-    const response = await CompanyProfilelist(); 
+    const response = await CompanyProfilelist();
     const profiles: CompanyProfile[] = response.data;
 
     console.log("Raw company profiles data:", profiles);
@@ -73,10 +83,10 @@ const getCompanyProfileOptions = async (): Promise<ComboboxOption[]> => {
     // First process with our form options utility
     const formOptions = processDataToFormOptions({
       data: profiles,
-      idField: 'id',
-      labelFields: ['first_name', 'middle_name', 'last_name'],
-      searchFields: ['email'],
-      fallbackField: 'email'
+      idField: "id",
+      labelFields: ["first_name", "middle_name", "last_name"],
+      searchFields: ["email"],
+      fallbackField: "email",
     });
 
     // Then convert to combobox format
@@ -88,9 +98,7 @@ const getCompanyProfileOptions = async (): Promise<ComboboxOption[]> => {
     console.error("Failed to get company profile options:", error);
     return [];
   }
-}; 
-
-
+};
 
 export function TaskForm({
   task,
@@ -99,7 +107,7 @@ export function TaskForm({
   task?: TaskInterface;
   add?: boolean;
 }) {
-  console.log("TAsk, add", task, add)
+  console.log("TAsk, add", task, add);
   const EMPTY_FORM_VALUES: TaskFormValues = {
     id: undefined,
     title: "",
@@ -110,17 +118,18 @@ export function TaskForm({
     supporting_staff: [],
     status: "open",
     due_date: "",
-  }
+  };
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema),
-    defaultValues: task ? mapTaskToFormValues(task) :  EMPTY_FORM_VALUES,
-  })
+    defaultValues: task ? mapTaskToFormValues(task) : EMPTY_FORM_VALUES,
+  });
 
-  
-  const {user} = useUser()
+  const { user } = useUser();
   // State management
-  const [companyProfiles, setCompanyProfiles] = React.useState<ComboboxOption[]>([]);
+  const [companyProfiles, setCompanyProfiles] = React.useState<
+    ComboboxOption[]
+  >([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -130,12 +139,10 @@ export function TaskForm({
   const setError = (val: string | null) =>
     setErrorRaw(val ? val.substring(0, 50) : null);
 
-  if (add){
-    form.setValue("owner", user.id); 
-
+  if (add) {
+    form.setValue("owner", user.id);
   }
-  
-  
+
   React.useEffect(() => {
     const fetchCompanyProfiles = async () => {
       try {
@@ -155,7 +162,10 @@ export function TaskForm({
   const addAction = () => {
     if (actionInput.trim()) {
       const currentActions = form.getValues("actions_required") || [];
-      form.setValue("actions_required", [...currentActions, actionInput.trim()]);
+      form.setValue("actions_required", [
+        ...currentActions,
+        actionInput.trim(),
+      ]);
       setActionInput("");
     }
   };
@@ -169,20 +179,18 @@ export function TaskForm({
 
   // Handle key press for actions
   const handleActionKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       addAction();
     }
   };
 
-  console.log("add", add)
+  console.log("add", add);
 
-  
   // Form submission handler
   const onSubmit = async (formdata: TaskFormValues) => {
-    
-    if (user){
-        formdata.owner = user.id
+    if (user) {
+      formdata.owner = user.id;
     }
     console.log("🚀 Task form submit triggered!");
     console.log("📝 Task form data received:", formdata);
@@ -190,12 +198,17 @@ export function TaskForm({
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
-    
+
     try {
-      
-      const response = add? await postTask(formdata) : await patchTask(formdata.id , formdata);
-      setSuccessMessage(response.data?.message || add? "Task added successfully!": "Task edited successfully!");
-      
+      const response = add
+        ? await postTask(formdata)
+        : await patchTask(formdata.id, formdata);
+      setSuccessMessage(
+        response.data?.message || add
+          ? "Task added successfully!"
+          : "Task edited successfully!"
+      );
+
       console.log("✅ API response:", response);
 
       // form.reset({
@@ -210,10 +223,9 @@ export function TaskForm({
       //   due_date: "",
       // });
       // setActionInput("");
-      
     } catch (err: any) {
       console.error("❌ API error:", err);
-      
+
       const backendErrors = err.response?.data;
       let nonFieldErrors: string[] = [];
       let fieldErrorsExist = false;
@@ -233,18 +245,17 @@ export function TaskForm({
           }
         }
       }
-      
+
       if (!fieldErrorsExist && nonFieldErrors.length > 0) {
         setError(nonFieldErrors.join(", "));
       } else if (!fieldErrorsExist) {
         setError("An unknown error occurred.");
       }
-      
     } finally {
       setLoading(false);
     }
   };
-  
+
   if (isLoading) {
     return <div>Loading company profiles...</div>;
   }
@@ -252,7 +263,7 @@ export function TaskForm({
   const actionsRequired = form.watch("actions_required") || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col gap-6 max-w-xl mx-auto">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Task Title Field */}
@@ -263,7 +274,10 @@ export function TaskForm({
               <FormItem>
                 <FormLabel>Task Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., Complete project documentation" {...field} />
+                  <Input
+                    placeholder="e.g., Complete project documentation"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -278,9 +292,9 @@ export function TaskForm({
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <AutoSizeTextarea 
-                    placeholder="Detailed description of the task..." 
-                    {...field} 
+                  <AutoSizeTextarea
+                    placeholder="Detailed description of the task..."
+                    {...field}
                     value={field.value || ""}
                   />
                 </FormControl>
@@ -289,7 +303,6 @@ export function TaskForm({
             )}
           />
 
-          
           {/* Actions Required Field */}
           <FormField
             control={form.control}
@@ -310,7 +323,7 @@ export function TaskForm({
             )}
           />
 
-           {/* Owner Field */}
+          {/* Owner Field */}
           <FormField
             control={form.control}
             name="owner"
@@ -328,15 +341,17 @@ export function TaskForm({
                     maxSelections={1}
                     clearable={true}
                     showDescription={true}
-                    disabled = {user?.user_details.groups.filter(group => group.id === 1 || group.id === 2).length !=0 }
+                    disabled={
+                      user?.user_details.groups.filter(
+                        (group) => group.id === 1 || group.id === 2
+                      ).length != 0
+                    }
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-         
 
           {/* Assignees Field */}
           <FormField
@@ -399,8 +414,8 @@ export function TaskForm({
                   <Calendar28
                     {...field}
                     disabledDates={[
-                      { dayOfWeek: [0, 6] },  // Disable weekends
-                      { before: new Date() }  // Disable past dates
+                      { dayOfWeek: [0, 6] }, // Disable weekends
+                      { before: new Date() }, // Disable past dates
                     ]}
                   />
                 </FormControl>
@@ -409,20 +424,21 @@ export function TaskForm({
             )}
           />
 
-
           {error && (
             <Alert variant="destructive">
               <AlertCircleIcon />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          <div className='text-[var(--constructive)]' >  
+          <div className="text-[var(--constructive)]">
             {successMessage && (
-            <Alert className='text-[var(--constructive)]' >
-              <CheckCircle2Icon className='text-[var(--constructive)]' />
-              <AlertDescription className='text-[var(--constructive)]' >{successMessage}</AlertDescription>
-            </Alert>
-          )}
+              <Alert className="text-[var(--constructive)]">
+                <CheckCircle2Icon className="text-[var(--constructive)]" />
+                <AlertDescription className="text-[var(--constructive)]">
+                  {successMessage}
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
@@ -432,4 +448,4 @@ export function TaskForm({
       </Form>
     </div>
   );
-};
+}

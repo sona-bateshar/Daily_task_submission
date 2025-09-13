@@ -1,4 +1,4 @@
-import { EditForm } from "./edit_form"
+import { EditForm } from "./edit_form";
 
 export default function Page() {
   return (
@@ -7,5 +7,5 @@ export default function Page() {
         <EditForm />
       </div>
     </div>
-  )
+  );
 }

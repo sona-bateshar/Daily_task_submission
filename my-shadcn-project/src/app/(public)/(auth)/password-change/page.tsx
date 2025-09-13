@@ -1,4 +1,4 @@
-import { Form } from "./form"
+import { Form } from "./form";
 
 export default function Page() {
   return (
@@ -7,6 +7,5 @@ export default function Page() {
         <Form />
       </div>
     </div>
-  )
+  );
 }
-
